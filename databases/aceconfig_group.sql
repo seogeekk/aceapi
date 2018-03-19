@@ -1,3 +1,5 @@
+USE acebody;
+
 SET SQL_SAFE_UPDATES = 0; 
  DELETE FROM aceconfig;
  DELETE FROM aceconfig_group;
