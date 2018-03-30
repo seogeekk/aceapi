@@ -218,3 +218,22 @@ INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho)
 				VALUES(@l_groupid, 3, 'Service Log', @l_user);
 
 select * from aceconfig where groupid = @l_groupid;
+
+/*
+  Inspection Reponse Type
+*/
+SET @l_groupid = 12;
+INSERT INTO aceconfig_group
+(groupid, description, lockflag, auditwho)
+VALUES (@l_groupid, 'Inspection Reponse Type', '0', @l_user);
+
+INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
+				VALUES(@l_groupid, 1, 'No Response', @l_user);
+INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
+				VALUES(@l_groupid, 2, 'Accepted', @l_user);
+INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
+				VALUES(@l_groupid, 3, 'Re-scheduled', @l_user);
+INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
+				VALUES(@l_groupid, 4, 'Cancelled', @l_user);
+
+select * from aceconfig where groupid = @l_groupid;

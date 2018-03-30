@@ -8,6 +8,10 @@ var staff = require('./handlers/staff-handler');
 var property = require('./handlers/property-handler');
 var claim = require('./handlers/claim-handler');
 var worklog = require('./handlers/worklog-handler');
+var inspection = require('./handlers/inspection-handler');
+var smsapi = require('../functions/sms');
+var addressapi = require('../functions/address');
+var aceconfig = require('./handlers/aceconfig-handler');
 
 /**
  * @swagger
@@ -139,6 +143,7 @@ router.post('/login', auth.login);
 
 // TODO : Add middleware to require JWT
 router.post('/changepasswd', user.changePassword);
+router.post('/createuser', user.createNewUser);
 
 /*
   /api/v1/users
@@ -170,7 +175,6 @@ router.get(apiversion + 'user/getuserid/:username', user.getUserID);
 router.get(apiversion + 'user/:username', user.getUserDetails);
 router.get(apiversion + 'user/', user.getAllUsers);
 router.get(apiversion + 'user/getrole/:username', user.getUserRole);
-router.post(apiversion + 'user/create', user.createNewUser);
 router.post(apiversion + 'user/changestatus', user.changeUserStatus);
 
 // Customer
@@ -772,5 +776,83 @@ router.get(apiversion + 'worklog/workitem/:worklogid', worklog.getWorkItemLog);
  *
  */
 router.get(apiversion + 'worklog/workitems/:worklogid', worklog.getAllWorkItemLog);
+
+// Inspection
+/**
+ * @swagger
+ * /api/v1/inspection/new:
+ *   post:
+ *     tags:
+ *     - inspection
+ *     security:
+ *     - apikey1: []
+ *     - apikey2: []
+ *     description: Create new inspection
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: inspection
+ *         description: Inspection to create
+ *         schema:
+ *           type: object
+ *           $ref: "#/definitions/inspection"
+ *     responses:
+ *       200:
+ *         description: Create inspection
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *             property:
+ *               type: object
+ *               $ref: "#/definitions/inspection"
+ *
+ */
+router.post(apiversion + 'inspection/new', inspection.createNewInspection);
+/**
+ * @swagger
+ * /api/v1/inspection/email:
+ *   post:
+ *     tags:
+ *     - inspection
+ *     security:
+ *     - apikey1: []
+ *     - apikey2: []
+ *     description: Send inspection email
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: inspection
+ *         description: Send Inspection request
+ *         schema:
+ *           type: object
+ *           $ref: "#/definitions/inspection"
+ *     responses:
+ *       200:
+ *         description: Send inspection request
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *             property:
+ *               type: object
+ *               $ref: "#/definitions/inspection"
+ *
+ */
+router.post(apiversion + 'inspection/email', inspection.sendInspectionEmail);
+
+
+router.post(apiversion + 'sms/notify', smsapi.sendSMS);
+router.get(apiversion + 'address/search', addressapi.searchAddress);
+router.get(apiversion + 'address/complete', addressapi.completeAddress);
+
+// Ace Config
+router.get(apiversion + 'config/:groupid', aceconfig.getGroupid);
+router.get(apiversion + 'config/:groupid/:ordinal', aceconfig.getOrdinal);
+
 
 module.exports = router;

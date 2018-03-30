@@ -107,10 +107,16 @@ var UserHandler = {
         var lastname = req.body.lastname;
         var emailaddress = req.body.emailaddress;
         var password = req.body.password;
+        var roleid = parseInt(req.body.roleid);
+
+        // Default to client
+        if (! roleid) {
+            roleid = 4;
+        }
 
         // TODO: encrypt password
         if (username && firstname && lastname && emailaddress && password) {
-            user.createUser(username, firstname, lastname, emailaddress, password, function (err, result) {
+            user.createUser(username, firstname, lastname, emailaddress, password, roleid, function (err, result) {
                 if (err) {
                     var error = new errhandler(err.code, err.message, err.stack);
                     res.status(constants.SERVER_ERROR_CODE).json(error);

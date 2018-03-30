@@ -19,9 +19,10 @@ var UserDTO = {
     getUserRole: function (username, callback) {
         return db.query("SELECT u.roleid, a.shortdesc FROM user u, aceconfig a WHERE a.groupid = 2 AND a.ordinal = u.roleid AND u.username = ?", [username], callback);
     },
-    createUser: function (username, firstname, lastname, emailaddress, password, callback) {
-        return db.query("INSERT INTO user (username, firstname, lastname, emailaddress, password)" +
-                        "VALUES (?, ?, ?, ?, SHA(?))", [username, firstname, lastname, emailaddress, password], callback);
+    createUser: function (username, firstname, lastname, emailaddress, password, roleid, callback) {
+        // default account status to Open
+        return db.query("INSERT INTO user (username, firstname, lastname, emailaddress, password, roleid, status)" +
+                        "VALUES (?, ?, ?, ?, SHA(?), ?, 1)", [username, firstname, lastname, emailaddress, password, roleid], callback);
     },
     lockUser: function(username, status, callback) {
         return db.query("UPDATE user SET status = ? WHERE username = ?", [status, username], callback);
