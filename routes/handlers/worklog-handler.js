@@ -42,6 +42,7 @@ function checkDir(directory) {
 
 var WorkLogHandler = {
     createNewWorkItem: function(req, res, next) {
+
         // create new instance of WorkItemObj
         var WorkItem = new WorkItemObj();
 
@@ -50,13 +51,18 @@ var WorkLogHandler = {
         WorkItem.worktype = parseInt(req.body.worktype);
         WorkItem.description = req.body.description;
         WorkItem.notes = req.body.notes;
-        WorkItem.auditwho = req.body.username;
+        WorkItem.username = req.body.username;
 
         // Attachment
-        var uploadFile = req.files.attachment;
+        var uploadFile;
+
+        if (req.files) {
+            uploadFile =  req.files.attachment;
+        }
+
 
         // TODO: Add validations to json body
-        if(WorkItem.worklogid && WorkItem.worktype && WorkItem.description) {
+        if(WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
 
             // If there's an upload file
             if (uploadFile) {
@@ -146,7 +152,7 @@ var WorkLogHandler = {
         WorkItem.worktype = req.body.worktype;
         WorkItem.description = req.body.description;
         WorkItem.notes = req.body.notes;
-        WorkItem.auditwho = req.body.username;
+        WorkItem.username = req.body.username;
 
         if(WorkItem.workitemid && WorkItem.worklogid && WorkItem.username) {
             worklog.updateWorkLog(WorkItem, function(error, results) {
@@ -180,7 +186,7 @@ var WorkLogHandler = {
 
         if(skip < 0) { skip = 0 }
 
-        var worklogid = req.param.worklogid;
+        var worklogid = req.params.worklogid;
 
         if (worklogid) {
             worklog.getAllWorkItemLog(worklogid, function(error, results) {
@@ -196,7 +202,7 @@ var WorkLogHandler = {
                     rows.push(new WorkItemDetObj(results[i]));
                 }
 
-                if (results.length == 1) {
+                if (results.length > 0) {
 
                     res.json({
                         success: true,
@@ -215,7 +221,7 @@ var WorkLogHandler = {
     },
     getWorkItemLog: function(req, res, next) {
 
-        var worklogid = parseInt(req.param.worklogid);
+        var worklogid = req.params.worklogid;
 
         if (worklogid) {
             worklog.getWorkItemLog(worklogid, function(error, results) {

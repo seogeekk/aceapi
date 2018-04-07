@@ -34,7 +34,7 @@ var ClaimHandler = {
         const CLAIM_OPEN_STATUS = 1;
 
         // Define parameters json body
-        Claim.propertyid = parseInt(req.body.propertyid);
+        Claim.property_canonical_id = req.body.property_canonical_id;
         Claim.claimtypeid = parseInt(req.body.claimtypeid);
         Claim.summary = req.body.summary;
         Claim.description = req.body.description;
@@ -42,7 +42,7 @@ var ClaimHandler = {
         Claim.status = CLAIM_OPEN_STATUS;
 
         // TODO: Add validations to json body
-        if(Claim.propertyid && Claim.claimtypeid && Claim.summary && Claim.submitteduser) {
+        if(Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser) {
             claim.createNewClaim(Claim, function(error, results) {
                 if (error) {
                     // Handle basic error
@@ -72,7 +72,7 @@ var ClaimHandler = {
 
         // Define parameters json body
         Claim.claimid = parseInt(req.body.claimid);
-        Claim.propertyid = parseInt(req.body.propertyid);
+        Claim.property_canonical_id = req.body.property_canonical_id;
         Claim.claimtypeid = parseInt(req.body.claimtypeid);
         Claim.summary = req.body.summary;
         Claim.description = req.body.description;
@@ -86,8 +86,9 @@ var ClaimHandler = {
         Claim.processeddate = Date.parse(req.body.processeddate) || undefined;
 
         console.log(Claim);
+        Claim.status = 1;
         // TODO: Add validations to json body
-        if(Claim.claimid && Claim.propertyid && Claim.claimtypeid && Claim.summary && Claim.submitteduser && Claim.status) {
+        if(Claim.claimid && Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser && Claim.status) {
             logger.info("updateClaimDetails["+Claim.claimid+"]");
             claim.updateClaimDetails(Claim, function(error, results) {
                 if (error) {
@@ -170,6 +171,43 @@ var ClaimHandler = {
                     res.json({
                         success: false,
                         claim: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getClaimByUser: function(req, res, next) {
+
+        var username = req.params.username;
+
+        if(username) {
+            claim.getClaimByUser(username, function(error, results) {
+                logger.info("getClaimByUser[" + username + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                logger.info("getClaimByUser() ret: " + results.length);
+                var rows = [];
+                for (var i = 0; i < results.length; i++) {
+                    rows.push(new claimDetObj(results[i]));
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        claims: rows
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        claims: null
                     })
                 }
             });

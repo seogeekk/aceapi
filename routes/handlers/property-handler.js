@@ -28,10 +28,10 @@ function parseError(error) {
 var PropertyHandler = {
     createNewProperty: function(req, res, next) {
         // create new instance of propertyObj
-        var Property = new propertyObj();
+        var Property = {};
 
         // Define parameters json body
-        Property.propertyname = req.body.propertyname;
+        Property.property_canonical_id = req.body.property_canonical_id;
         Property.address1 = req.body.address1;
         Property.address2 = req.body.address2;
         Property.suburb = req.body.suburb;
@@ -39,12 +39,14 @@ var PropertyHandler = {
         Property.postcode = parseInt(req.body.postcode);
         Property.country = req.body.country;
         Property.propertytype = parseInt(req.body.propertytype);
-        Property.latitude = parseInt(req.body.latitude);
-        Property.longitude = parseInt(req.body.longitude);
+        Property.latitude = req.body.latitude;
+        Property.longitude = req.body.longitude;
+        Property.unit_type = req.body.unit_type || undefined;
+        Property.mesh_block = req.body.mesh_block;
 
         console.log(Property);
         // TODO: Add validations to json body
-        if(Property.address1 && Property.suburb && Property.state && Property.postcode && Property.country) {
+        if(Property.property_canonical_id && Property.address1 && Property.suburb && Property.state && Property.postcode && Property.country) {
             property.createNewProperty(Property, function(error, results) {
                 if (error) {
                     // Handle basic error
@@ -73,7 +75,7 @@ var PropertyHandler = {
         var Property = new propertyObj();
 
         // Define parameters json body
-        Property.propertyname = req.body.propertyname;
+        Property.property_canonical_id = req.body.property_canonical_id;
         Property.address1 = req.body.address1;
         Property.address2 = req.body.address2;
         Property.suburb = req.body.suburb;
@@ -81,13 +83,15 @@ var PropertyHandler = {
         Property.postcode = parseInt(req.body.postcode);
         Property.country = req.body.country;
         Property.propertytype = parseInt(req.body.propertytype);
-        Property.latitude = parseInt(req.body.latitude);
-        Property.longitude = ParseInt(req.body.longitude);
+        Property.latitude = req.body.latitude;
+        Property.longitude = req.body.longitude;
+        Property.unit_type = req.body.unit_type || undefined;
+        Property.mesh_block = req.body.mesh_block;
 
         // TODO: Add validations to json body
-        if(Property.propertyid && Property.address1 && Property.suburb && Property.state && Property.postcode && Property.country) {
-            logger.info("updateStaffDetails["+propertyid+"]");
-            staff.updateStaffDetails(Property, function(error, results) {
+        if(Property.property_canonical_id && Property.address1 && Property.suburb && Property.state && Property.postcode && Property.country) {
+            logger.info("updatePropertyDetails["+propertyid+"]");
+            property.updatePropertyDetails(Property, function(error, results) {
                 if (error) {
                     // Handle basic error
                     res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
@@ -153,6 +157,34 @@ var PropertyHandler = {
         if(propertyid) {
             property.getPropertyDetails(propertyid, function(error, results) {
                 logger.info("getPropertyDetails [" + propertyid + "]");
+                if (error) {
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if (results.length == 1) {
+                    var propertyDetails = new propertyDetObj(results[0]);
+                    res.json({
+                        success: true,
+                        property: propertyDetails
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        property: null
+                    })
+                }
+            })
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getPropertyByCanonical: function(req, res, next) {
+        var canonicalid = req.params.canonicalid;
+
+        if(canonicalid) {
+            property.getPropertyByCanonical(canonicalid, function(error, results) {
+                logger.info("getPropertyByCanonical [" + canonicalid + "]");
                 if (error) {
                     res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
                     return;

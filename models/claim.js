@@ -13,14 +13,22 @@ var ClaimDTO = {
 
         logger.info("query: createNewClaim[]");
         console.log(claimObj);
-        db.query("INSERT INTO claim SET ?", [claimObj], callback);
+        db.query("INSERT INTO claim (property_canonical_id, claimtypeid, summary, description, submitteduser)" +
+            "VALUES(?, ?, ?, ?, ?)",
+            [
+                claimObj.property_canonical_id,
+                claimObj.claimtypeid,
+                claimObj.summary,
+                claimObj.description,
+                claimObj.submitteduser
+            ], callback);
     },
     updateClaimDetails: function(claimObj, callback) {
         // this requires claimid to be unique
 
         logger.info("query: updateClaimDetails["+claimObj.claimid+"]");
         db.query("UPDATE claim " +
-                    "SET propertyid = ?," +
+                    "SET property_canonical_id = ?," +
                         "claimtypeid = ?," +
                         "summary = ?," +
                         "description = ?," +
@@ -34,7 +42,7 @@ var ClaimDTO = {
                         "processeddate = ? " +
                     "WHERE claimid = ?",
                         [
-                            claimObj.propertyid,
+                            claimObj.property_canonical_id,
                             claimObj.claimtypeid,
                             claimObj.summary,
                             claimObj.description,
@@ -53,8 +61,7 @@ var ClaimDTO = {
 
         logger.info("query: getAllClaims["+limit+","+offset+"]");
         db.query("SELECT claimid," +
-                        "propertyid," +
-                        "propertyname," +
+                        "property_canonical_id," +
                         "address1," +
                         "address2," +
                         "suburb," +
@@ -65,6 +72,8 @@ var ClaimDTO = {
                         "propertytypename," +
                         "latitude," +
                         "longitude," +
+                        "mesh_block," +
+                        "unit_type," +
                         "claimtypeid," +
                         "claimtypename," +
                         "summary," +
@@ -87,7 +96,7 @@ var ClaimDTO = {
         logger.info("query: getClaimDetails["+claimid+"]");
         db.query("SELECT claimid," +
                         "propertyid," +
-                        "propertyname," +
+                        "property_canonical_id," +
                         "address1," +
                         "address2," +
                         "suburb," +
@@ -98,6 +107,8 @@ var ClaimDTO = {
                         "propertytypename," +
                         "latitude," +
                         "longitude," +
+                        "mesh_block," +
+                        "unit_type," +
                         "claimtypeid," +
                         "claimtypename," +
                         "summary," +
@@ -111,12 +122,43 @@ var ClaimDTO = {
                         "approvaldate," +
                         "authoriseddate," +
                         "approveruser," +
-                        "processeddate" +
+                        "processeddate " +
                         "FROM claimdetails " +
                         "WHERE claimid = ?", [claimid], callback);
     },
-    getClaimByParam: function(username, status, callback) {
-
+    getClaimByUser: function(username, callback) {
+        logger.info("query: getClaimByUser["+username+"]");
+        db.query("SELECT claimid," +
+            "propertyid," +
+            "property_canonical_id," +
+            "address1," +
+            "address2," +
+            "suburb," +
+            "state," +
+            "postcode," +
+            "country," +
+            "propertytypeid," +
+            "propertytypename," +
+            "latitude," +
+            "longitude," +
+            "mesh_block," +
+            "unit_type," +
+            "claimtypeid," +
+            "claimtypename," +
+            "summary," +
+            "description," +
+            "submitteddate," +
+            "submitteduser," +
+            "status," +
+            "statusname," +
+            "reviewstartdate," +
+            "reviewenddate," +
+            "approvaldate," +
+            "authoriseddate," +
+            "approveruser," +
+            "processeddate " +
+            "FROM claimdetails " +
+            "WHERE submitteduser = ?", [username], callback);
     }
 };
 

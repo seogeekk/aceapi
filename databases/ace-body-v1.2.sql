@@ -47,30 +47,6 @@ CREATE INDEX `groupconfigfk_idx` ON `acebody`.`aceconfig` (`groupid` ASC) ;
 
 
 -- -----------------------------------------------------
--- Table `acebody`.`property`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `acebody`.`property` ;
-
-CREATE  TABLE IF NOT EXISTS `acebody`.`property` (
-  `propertyid` FLOAT(9,2) NOT NULL AUTO_INCREMENT ,
-  `propertyname` VARCHAR(80) NULL DEFAULT NULL ,
-  `address1` VARCHAR(50) NULL DEFAULT NULL ,
-  `address2` VARCHAR(50) NULL DEFAULT NULL ,
-  `suburb` VARCHAR(25) NULL DEFAULT NULL ,
-  `state` VARCHAR(50) NULL DEFAULT NULL ,
-  `postcode` INT(11) NULL DEFAULT NULL ,
-  `country` VARCHAR(50) NULL DEFAULT NULL ,
-  `propertytype` INT(11) NULL DEFAULT NULL ,
-  `latitude` INT(11) NULL DEFAULT NULL ,
-  `longitude` INT(11) NULL DEFAULT NULL ,
-  PRIMARY KEY (`propertyid`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
-
-CREATE UNIQUE INDEX `propertyid_UNIQUE` ON `acebody`.`property` (`propertyid` ASC) ;
-
-
--- -----------------------------------------------------
 -- Table `acebody`.`user`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `acebody`.`user` ;
@@ -89,7 +65,7 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`user` (
   `status` INT(11) NULL DEFAULT NULL ,
   PRIMARY KEY (`userid`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 5
+AUTO_INCREMENT = 19
 DEFAULT CHARACTER SET = latin1;
 
 CREATE UNIQUE INDEX `username_UNIQUE` ON `acebody`.`user` (`username` ASC) ;
@@ -101,8 +77,8 @@ CREATE UNIQUE INDEX `username_UNIQUE` ON `acebody`.`user` (`username` ASC) ;
 DROP TABLE IF EXISTS `acebody`.`claim` ;
 
 CREATE  TABLE IF NOT EXISTS `acebody`.`claim` (
-  `claimid` FLOAT(9,2) NOT NULL AUTO_INCREMENT,
-  `propertyid` FLOAT(9,2) NOT NULL ,
+  `claimid` FLOAT(9,2) NOT NULL AUTO_INCREMENT ,
+  `property_canonical_id` VARCHAR(50) NOT NULL ,
   `claimtypeid` INT(11) NOT NULL ,
   `summary` VARCHAR(150) NULL DEFAULT NULL ,
   `description` TEXT NULL DEFAULT NULL ,
@@ -116,20 +92,18 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`claim` (
   `approveruser` VARCHAR(16) NULL DEFAULT NULL ,
   `processeddate` DATETIME NULL DEFAULT NULL ,
   PRIMARY KEY (`claimid`) ,
-  CONSTRAINT `propertyclaimfk`
-    FOREIGN KEY (`propertyid` )
-    REFERENCES `acebody`.`property` (`propertyid` ),
   CONSTRAINT `userclaimfk`
     FOREIGN KEY (`submitteduser` )
     REFERENCES `acebody`.`user` (`username` ))
 ENGINE = InnoDB
+AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = latin1;
 
 CREATE UNIQUE INDEX `claimid_UNIQUE` ON `acebody`.`claim` (`claimid` ASC) ;
 
 CREATE INDEX `userclaimfk_idx` ON `acebody`.`claim` (`submitteduser` ASC) ;
 
-CREATE INDEX `propertyclaimfk_idx` ON `acebody`.`claim` (`propertyid` ASC) ;
+CREATE INDEX `propertyclaimfk_idx` ON `acebody`.`claim` (`property_canonical_id` ASC) ;
 
 
 -- -----------------------------------------------------
@@ -174,6 +148,7 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`attachment` (
   `auditwhen` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`itemid`) )
 ENGINE = InnoDB
+AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = latin1;
 
 
@@ -234,7 +209,6 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`custclass` (
   `auditwhen` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`custclass`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = latin1;
 
 
@@ -263,7 +237,7 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`customer` (
     FOREIGN KEY (`username` )
     REFERENCES `acebody`.`user` (`username` ))
 ENGINE = InnoDB
-AUTO_INCREMENT = 7
+AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = latin1;
 
 CREATE UNIQUE INDEX `customeruser_ux` ON `acebody`.`customer` (`username` ASC) ;
@@ -318,6 +292,7 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`workloghistory` (
     FOREIGN KEY (`worklogid` )
     REFERENCES `acebody`.`claim` (`claimid` ))
 ENGINE = InnoDB
+AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = latin1;
 
 CREATE INDEX `claimworklogfk_idx` ON `acebody`.`workloghistory` (`worklogid` ASC) ;
@@ -343,6 +318,7 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`inspection` (
     FOREIGN KEY (`workitemid` )
     REFERENCES `acebody`.`workloghistory` (`workitemid` ))
 ENGINE = InnoDB
+AUTO_INCREMENT = 9
 DEFAULT CHARACTER SET = latin1;
 
 CREATE INDEX `workloginspectfk_idx` ON `acebody`.`inspection` (`workitemid` ASC) ;
@@ -387,6 +363,33 @@ DEFAULT CHARACTER SET = latin1;
 
 
 -- -----------------------------------------------------
+-- Table `acebody`.`property`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `acebody`.`property` ;
+
+CREATE  TABLE IF NOT EXISTS `acebody`.`property` (
+  `propertyid` FLOAT(9,2) NOT NULL AUTO_INCREMENT ,
+  `property_canonical_id` VARCHAR(50) NOT NULL ,
+  `address1` VARCHAR(50) NULL DEFAULT NULL ,
+  `address2` VARCHAR(50) NULL DEFAULT NULL ,
+  `suburb` VARCHAR(25) NULL DEFAULT NULL ,
+  `state` VARCHAR(50) NULL DEFAULT NULL ,
+  `postcode` INT(11) NULL DEFAULT NULL ,
+  `country` VARCHAR(50) NULL DEFAULT NULL ,
+  `propertytype` INT(11) NULL DEFAULT NULL ,
+  `latitude` DECIMAL(12,6) NULL DEFAULT NULL ,
+  `longitude` DECIMAL(12,6) NULL DEFAULT NULL ,
+  `unit_type` VARCHAR(25) NULL DEFAULT NULL ,
+  `mesh_block` DECIMAL(12,0) NULL DEFAULT NULL ,
+  PRIMARY KEY (`propertyid`, `property_canonical_id`) )
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = latin1;
+
+CREATE UNIQUE INDEX `propertyid_UNIQUE` ON `acebody`.`property` (`propertyid` ASC) ;
+
+
+-- -----------------------------------------------------
 -- Table `acebody`.`staff`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `acebody`.`staff` ;
@@ -402,7 +405,6 @@ CREATE  TABLE IF NOT EXISTS `acebody`.`staff` (
     FOREIGN KEY (`username` )
     REFERENCES `acebody`.`user` (`username` ))
 ENGINE = InnoDB
-AUTO_INCREMENT = 11
 DEFAULT CHARACTER SET = latin1;
 
 CREATE INDEX `userstafffk_idx` ON `acebody`.`staff` (`username` ASC) ;
@@ -457,7 +459,12 @@ USE `acebody` ;
 -- -----------------------------------------------------
 -- Placeholder table for view `acebody`.`claimdetails`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `acebody`.`claimdetails` (`claimid` INT, `propertyid` INT, `propertyname` INT, `address1` INT, `address2` INT, `suburb` INT, `state` INT, `postcode` INT, `country` INT, `propertytypeid` INT, `propertytypename` INT, `latitude` INT, `longitude` INT, `claimtypeid` INT, `claimtypename` INT, `summary` INT, `description` INT, `submitteddate` INT, `submitteduser` INT, `status` INT, `statusname` INT, `reviewstartdate` INT, `reviewenddate` INT, `approvaldate` INT, `authoriseddate` INT, `approveruser` INT, `processeddate` INT);
+CREATE TABLE IF NOT EXISTS `acebody`.`claimdetails` (`claimid` INT, `property_canonical_id` INT, `address1` INT, `address2` INT, `suburb` INT, `state` INT, `postcode` INT, `country` INT, `propertytypeid` INT, `propertytypename` INT, `latitude` INT, `longitude` INT, `mesh_block` INT, `unit_type` INT, `claimtypeid` INT, `claimtypename` INT, `summary` INT, `description` INT, `submitteddate` INT, `submitteduser` INT, `status` INT, `statusname` INT, `reviewstartdate` INT, `reviewenddate` INT, `approvaldate` INT, `authoriseddate` INT, `approveruser` INT, `processeddate` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `acebody`.`inspectiondetails`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `acebody`.`inspectiondetails` (`inspectionid` INT, `customer` INT, `emailaddress` INT, `property` INT, `inspectiondate` INT, `claimid` INT, `summary` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `acebody`.`workitemdetails`
@@ -465,12 +472,59 @@ CREATE TABLE IF NOT EXISTS `acebody`.`claimdetails` (`claimid` INT, `propertyid`
 CREATE TABLE IF NOT EXISTS `acebody`.`workitemdetails` (`workitemid` INT, `worklogid` INT, `worktype` INT, `worktypename` INT, `creationdate` INT, `description` INT, `notes` INT, `auditwho` INT, `auditwhen` INT, `itemid` INT, `attachment` INT, `attachmenttype` INT, `filetypename` INT, `attachwho` INT, `attachwhen` INT);
 
 -- -----------------------------------------------------
+-- procedure sp_validate_user
+-- -----------------------------------------------------
+
+USE `acebody`;
+DROP procedure IF EXISTS `acebody`.`sp_validate_user`;
+
+DELIMITER $$
+USE `acebody`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_validate_user`(IN p_username VARCHAR(16), 
+								  IN p_password VARCHAR(200),
+								  IN p_actiontype INT,
+								  IN p_ipaddress VARCHAR(32),
+								  IN p_browser VARCHAR(30),
+									OUT p_retcode INT)
+exit_prog:BEGIN
+
+declare l_exists int;
+
+set p_retcode = 0;
+
+SELECT COUNT(*) INTO l_exists
+FROM user 
+WHERE username = p_username AND password = SHA(p_password);
+
+if (l_exists = 1) then
+	INSERT INTO loginhistory (username, actiontype, ipaddress, browser)
+	VALUES(p_username, p_actiontype, p_ipaddress, p_browser);
+	
+	if (row_count() = 1) then
+		set p_retcode = 1;
+		leave exit_prog;
+	end if;
+end if;
+
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
 -- View `acebody`.`claimdetails`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS `acebody`.`claimdetails` ;
 DROP TABLE IF EXISTS `acebody`.`claimdetails`;
 USE `acebody`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `acebody`.`claimdetails` AS select `c`.`claimid` AS `claimid`,`c`.`propertyid` AS `propertyid`,`p`.`propertyname` AS `propertyname`,`p`.`address1` AS `address1`,`p`.`address2` AS `address2`,`p`.`suburb` AS `suburb`,`p`.`state` AS `state`,`p`.`postcode` AS `postcode`,`p`.`country` AS `country`,`p`.`propertytype` AS `propertytypeid`,`ac9`.`longdesc` AS `propertytypename`,`p`.`latitude` AS `latitude`,`p`.`longitude` AS `longitude`,`c`.`claimtypeid` AS `claimtypeid`,`ac3`.`shortdesc` AS `claimtypename`,`c`.`summary` AS `summary`,`c`.`description` AS `description`,`c`.`submitteddate` AS `submitteddate`,`c`.`submitteduser` AS `submitteduser`,`c`.`status` AS `status`,`ac4`.`longdesc` AS `statusname`,`c`.`reviewstartdate` AS `reviewstartdate`,`c`.`reviewenddate` AS `reviewenddate`,`c`.`approvaldate` AS `approvaldate`,`c`.`authoriseddate` AS `authoriseddate`,`c`.`approveruser` AS `approveruser`,`c`.`processeddate` AS `processeddate` from ((((`acebody`.`claim` `c` join `acebody`.`property` `p` on((`p`.`propertyid` = `c`.`propertyid`))) left join `acebody`.`aceconfig` `ac9` on(((`p`.`propertytype` = `ac9`.`ordinal`) and (`ac9`.`groupid` = 9)))) left join `acebody`.`aceconfig` `ac4` on(((`c`.`status` = `ac4`.`ordinal`) and (`ac4`.`groupid` = 4)))) left join `acebody`.`aceconfig` `ac3` on(((`c`.`claimtypeid` = `ac3`.`ordinal`) and (`ac3`.`groupid` = 3))));
+CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `acebody`.`claimdetails` AS select `c`.`claimid` AS `claimid`,`c`.`property_canonical_id` AS `property_canonical_id`,`p`.`propertyid` AS `propertyid`,`p`.`address1` AS `address1`,`p`.`address2` AS `address2`,`p`.`suburb` AS `suburb`,`p`.`state` AS `state`,`p`.`postcode` AS `postcode`,`p`.`country` AS `country`,`p`.`propertytype` AS `propertytypeid`,`ac9`.`longdesc` AS `propertytypename`,`p`.`latitude` AS `latitude`,`p`.`longitude` AS `longitude`,`p`.`mesh_block` AS `mesh_block`,`p`.`unit_type` AS `unit_type`,`c`.`claimtypeid` AS `claimtypeid`,`ac3`.`shortdesc` AS `claimtypename`,`c`.`summary` AS `summary`,`c`.`description` AS `description`,`c`.`submitteddate` AS `submitteddate`,`c`.`submitteduser` AS `submitteduser`,`c`.`status` AS `status`,`ac4`.`longdesc` AS `statusname`,`c`.`reviewstartdate` AS `reviewstartdate`,`c`.`reviewenddate` AS `reviewenddate`,`c`.`approvaldate` AS `approvaldate`,`c`.`authoriseddate` AS `authoriseddate`,`c`.`approveruser` AS `approveruser`,`c`.`processeddate` AS `processeddate` from ((((`acebody`.`claim` `c` join `acebody`.`property` `p` on((`p`.`property_canonical_id` = `c`.`property_canonical_id`))) left join `acebody`.`aceconfig` `ac9` on(((`p`.`propertytype` = `ac9`.`ordinal`) and (`ac9`.`groupid` = 9)))) left join `acebody`.`aceconfig` `ac4` on(((`c`.`status` = `ac4`.`ordinal`) and (`ac4`.`groupid` = 4)))) left join `acebody`.`aceconfig` `ac3` on(((`c`.`claimtypeid` = `ac3`.`ordinal`) and (`ac3`.`groupid` = 3))));
+
+-- -----------------------------------------------------
+-- View `acebody`.`inspectiondetails`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `acebody`.`inspectiondetails` ;
+DROP TABLE IF EXISTS `acebody`.`inspectiondetails`;
+USE `acebody`;
+CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `acebody`.`inspectiondetails` AS select `i`.`inspectionid` AS `inspectionid`,concat(`u`.`firstname`,' ',`u`.`lastname`) AS `customer`,`u`.`emailaddress` AS `emailaddress`,concat(`c`.`address1`,' ',`c`.`address2`,', ',`c`.`suburb`,', ',`c`.`state`,' ',`c`.`postcode`) AS `property`,date_format(`i`.`inspectiondate`,'%M %c, %Y %H:%i:%S, %W') AS `inspectiondate`,`c`.`claimid` AS `claimid`,(select `acebody`.`claim`.`summary` from `acebody`.`claim` where (`acebody`.`claim`.`claimid` = `c`.`claimid`)) AS `summary` from (((`acebody`.`inspection` `i` join `acebody`.`workloghistory` `w` on((`i`.`workitemid` = `w`.`workitemid`))) join `acebody`.`claimdetails` `c` on((`c`.`claimid` = `w`.`worklogid`))) join `acebody`.`user` `u` on((`u`.`username` = `c`.`submitteduser`)));
 
 -- -----------------------------------------------------
 -- View `acebody`.`workitemdetails`

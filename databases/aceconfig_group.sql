@@ -182,6 +182,8 @@ INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho)
 				VALUES(@l_groupid, 3, 'Commercial', @l_user);
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
 				VALUES(@l_groupid, 4, 'Strata Property', @l_user);
+INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
+				VALUES(@l_groupid, 5, 'Others', @l_user);
 
 select * from aceconfig where groupid = @l_groupid;
 

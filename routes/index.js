@@ -426,6 +426,7 @@ router.get(apiversion + 'property/', property.getAllProperties);
  *
  */
 router.get(apiversion + 'property/:propertyid', property.getPropertyDetails);
+router.get(apiversion + 'property/canonical/:canonicalid', property.getPropertyByCanonical);
 
 // Claim
 /**
@@ -461,6 +462,34 @@ router.get(apiversion + 'property/:propertyid', property.getPropertyDetails);
  *
  */
 router.post(apiversion + 'claim/new', claim.createNewClaim);
+/**
+ * @swagger
+ *
+ * /api/v1/claim/username/{username}:
+ *   get:
+ *     tags:
+ *     - claim
+ *     security:
+ *     - apikey1: []
+ *     - apikey2: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Return a claim details
+ *         schema:
+ *           type: object
+ *           properties:
+ *             success:
+ *               type: boolean
+ *             page:
+ *               type: integer
+ *             property:
+ *               type: object
+ *               $ref: "#/definitions/claim"
+ *
+ */
+router.get(apiversion + 'claim/username/:username', claim.getClaimByUser);
 /**
  * @swagger
  * /api/v1/claim/update:
@@ -719,7 +748,7 @@ router.post(apiversion + 'worklog/upload/delete', worklog.deleteAttachment);
 /**
  * @swagger
  *
- * /api/v1/worklog/workitem{worklogid}:
+ * /api/v1/worklog/workitem/{worklogid}:
  *   get:
  *     tags:
  *     - worklog

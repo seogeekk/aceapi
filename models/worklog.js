@@ -171,14 +171,14 @@ var WorkLogDTO = {
     getAllWorkItemLog: function(worklogid, callback) {
         logger.info("query: getAllWorkItemLog["+worklogid+"]");
         db.query("SELECT workitemid, worklogid, worktype, worktypename, creationdate, description, notes, auditwho, auditwhen," +
-            "itemid, attachment, type, filetypename, attachwho, attachwhen " +
+            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen " +
             "FROM workitemdetails " +
             "WHERE worklogid = ?", [worklogid], callback);
     },
     getWorkItemLog: function(workitemid, callback) {
         logger.info("query: getAllWorkItemLog["+worklogid+"]");
         db.query("SELECT workitemid, worklogid, worktype, worktypename, creationdate, description, notes, auditwho, auditwhen," +
-            "itemid, attachment, type, filetypename, attachwho, attachwhen " +
+            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen " +
             "FROM workitemdetails " +
             "WHERE workitemid = ?", [workitemid], callback);
     }

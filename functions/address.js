@@ -44,13 +44,16 @@ var AddressApi =  {
                     response.json({
                         success: true,
                         address: {
+                            property_canonical_address: json.address.canonical_address_id,
                             address1: json.address.address_line_1,
                             address2: json.address.address_line_2,
                             suburb: json.address.locality_name,
                             state: json.address.state_territory,
                             postcode: json.address.postcode,
                             latitude: json.address.latitude,
-                            longitude: json.address.longitude
+                            longitude: json.address.longitude,
+                            mesh_block: json.address.meshblock,
+                            unit_type: json.address.unit_type
                         }
                     });
                 } else {
