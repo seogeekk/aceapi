@@ -33,6 +33,8 @@ function parseError(error) {
 }
 
 function checkDir(directory) {
+    logger.debug("Checking directory: "+ directory);
+
     if (!fs.existsSync(directory)){
         logger.debug("Creating directory: " + directory);
         fs.mkdirSync(directory);
