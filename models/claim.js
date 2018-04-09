@@ -173,17 +173,20 @@ var ClaimDTO = {
             if(error) {
                 callback(error);
             }
-            if (results) {
+            if (results.length == 1) {
                 var lastuser = results[0].username;
                 if (username == lastuser) {
                     // we shouldn't assign any
                     callback(null, results);
-                } else {
-                    return db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
-                        "VALUES(?, ?, ?)", [claimid, username, auditwho], callback);
                 }
+            }else {
+                return db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
+                    "VALUES(?, ?, ?)", [claimid, username, auditwho], callback);
             }
         })
+    },
+    updateClaimStatus: function(claimid, status, callback) {
+        return db.query("UPDATE claim SET status = ? WHERE claimid = ?", [status, claimid], callback);
     }
 };
 

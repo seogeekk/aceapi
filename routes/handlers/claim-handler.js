@@ -216,6 +216,7 @@ var ClaimHandler = {
         }
     },
     assignClaim: function(req, res, next) {
+
         var username = req.body.username;
         var claimid = parseInt(req.body.claimid);
         var auditwho = req.body.auditwho;
@@ -273,6 +274,38 @@ var ClaimHandler = {
                     res.json({
                         success: false,
                         staff: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    updateClaimStatus: function(req, res, next) {
+        var claimid = req.body.claimid;
+        var status = req.body.status
+
+        console.log({claimid: claimid, status: status})
+        if(claimid && status) {
+            claim.updateClaimStatus(claimid, status, function(error, results) {
+                logger.info("updateClaimStatus[" + claimid + ", " + status + "]");
+
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.affectedRows == 1 || results.changedRows == 1) {
+                    res.json({
+                        success: true,
+                        claimid: claimid
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        claimid: claimid
                     })
                 }
             });

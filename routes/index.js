@@ -879,8 +879,10 @@ router.post(apiversion + 'inspection/new', inspection.createNewInspection);
 router.post(apiversion + 'inspection/email', inspection.sendInspectionEmail);
 
 // assign
-router.post(apiversion + 'claim/assign', claim.assignClaim);
+router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
+
+router.post(apiversion + 'claim/status', claim.updateClaimStatus);
 
 router.post(apiversion + 'sms/notify', smsapi.sendSMS);
 router.get(apiversion + 'address/search', addressapi.searchAddress);
