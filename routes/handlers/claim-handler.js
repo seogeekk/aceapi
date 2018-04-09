@@ -214,6 +214,71 @@ var ClaimHandler = {
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
+    },
+    assignClaim: function(req, res, next) {
+        var username = req.body.username;
+        var claimid = parseInt(req.body.claimid);
+        var auditwho = req.body.auditwho;
+
+        if(username && claimid && auditwho) {
+            claim.assignClaim(username, claimid, auditwho, function(error, results) {
+                logger.info("assignClaim[" + username + ", " + claimid + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.insertId) {
+                    res.json({
+                        success: true,
+                        username: username
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        username: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getAssignment: function(req, res, next) {
+        var claimid = req.params.claimid;
+
+        if(claimid) {
+            claim.getAssignment(claimid, function(error, results) {
+                logger.info("getAssignment[" + claimid + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length == 1) {
+                    res.json({
+                        success: true,
+                        staff: {
+                            username: results[0].username,
+                            staffname: results[0].staffname
+                        }
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        staff: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
     }
 };
 

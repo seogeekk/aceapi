@@ -88,9 +88,9 @@ var PropertyHandler = {
         Property.unit_type = req.body.unit_type || undefined;
         Property.mesh_block = req.body.mesh_block;
 
+        console.log(Property);
         // TODO: Add validations to json body
         if(Property.property_canonical_id && Property.address1 && Property.suburb && Property.state && Property.postcode && Property.country) {
-            logger.info("updatePropertyDetails["+propertyid+"]");
             property.updatePropertyDetails(Property, function(error, results) {
                 if (error) {
                     // Handle basic error

@@ -26,13 +26,14 @@ var claimid,
     approvaldate,
     authoriseddate,
     approveruser,
-    processeddate;
+    processeddate,
+    property_canonical_id;
 
 module.exports = { Claim, ClaimDetail };
 
 function Claim() {
     this.claimid = claimid;
-    this.propertyid = propertyid;
+    this.property_canonical_id = property_canonical_id;
     this.claimtypeid = claimtypeid;
     this.summary = summary;
     this.description = description;
@@ -50,8 +51,8 @@ function Claim() {
 function ClaimDetail(Claim) {
     this.claimid = Claim.claimid;
     this.property = {
-        id: Claim.propertyid,
         name: Claim.propertyname,
+        property_canonical_id: Claim.property_canonical_id,
         address1: Claim.address1,
         address2: Claim.address2,
         suburb: Claim.suburb,

@@ -6,6 +6,9 @@ var staffname;
 var department;
 var accesstype;
 
+var mobilenumber;
+var emailaddress;
+
 module.exports = { Staff, StaffDetail };
 
 function Staff(username) {
@@ -14,6 +17,8 @@ function Staff(username) {
     this.staffname = staffname;
     this.department = department;
     this.accesstype = accesstype;
+    this.mobilenumber = mobilenumber;
+    this.emailaddress = emailaddress;
 }
 
 function StaffDetail(Staff) {
@@ -28,4 +33,6 @@ function StaffDetail(Staff) {
                         typeid: Staff.accesstypeid,
                         name: Staff.accesstypename
                       };
+    this.mobilenumber = Staff.mobilenumber;
+    this.emailaddress = Staff.emailaddress;
 }

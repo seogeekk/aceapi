@@ -13,14 +13,15 @@ var ClaimDTO = {
 
         logger.info("query: createNewClaim[]");
         console.log(claimObj);
-        db.query("INSERT INTO claim (property_canonical_id, claimtypeid, summary, description, submitteduser)" +
-            "VALUES(?, ?, ?, ?, ?)",
+        db.query("INSERT INTO claim (property_canonical_id, claimtypeid, summary, description, submitteduser, status)" +
+            "VALUES(?, ?, ?, ?, ?, ?)",
             [
                 claimObj.property_canonical_id,
                 claimObj.claimtypeid,
                 claimObj.summary,
                 claimObj.description,
-                claimObj.submitteduser
+                claimObj.submitteduser,
+                claimObj.status
             ], callback);
     },
     updateClaimDetails: function(claimObj, callback) {
@@ -159,6 +160,30 @@ var ClaimDTO = {
             "processeddate " +
             "FROM claimdetails " +
             "WHERE submitteduser = ?", [username], callback);
+    },
+
+    getAssignment: function(claimid, callback) {
+        return db.query("SELECT a.username, s.staffname FROM assignhistory a " +
+            "JOIN staff s ON s.username = a.username " +
+            "WHERE a.claimid = ? ORDER BY a.auditwhen DESC LIMIT 1", [claimid], callback);
+    },
+    assignClaim: function(username, claimid, auditwho, callback) {
+
+        return db.query("SELECT username FROM assignhistory WHERE claimid = ? ORDER BY auditwhen DESC LIMIT 1", [claimid], function(error, results) {
+            if(error) {
+                callback(error);
+            }
+            if (results) {
+                var lastuser = results[0].username;
+                if (username == lastuser) {
+                    // we shouldn't assign any
+                    callback(null, results);
+                } else {
+                    return db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
+                        "VALUES(?, ?, ?)", [claimid, username, auditwho], callback);
+                }
+            }
+        })
     }
 };
 

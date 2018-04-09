@@ -107,35 +107,88 @@ var UserHandler = {
         var lastname = req.body.lastname;
         var emailaddress = req.body.emailaddress;
         var password = req.body.password;
-        var roleid = parseInt(req.body.roleid);
+        var roleid = parseInt(req.body.roleid) || 4; // default to client if not provided
+
+        // Staff related
+        var department = parseInt(req.body.department);
+        var accesstype = parseInt(req.body.accesstype);
 
         // Default to client
-        if (! roleid) {
+        /*if (! roleid) {
             roleid = 4;
+        }*/
+
+        var User = {
+            username: username,
+            firstname: firstname,
+            lastname: lastname,
+            emailaddress: emailaddress,
+            password: password,
+            roleid: roleid,
+            department: department,
+            accesstype: accesstype
         }
 
+        console.log(User);
         // TODO: encrypt password
         if (username && firstname && lastname && emailaddress && password) {
-            user.createUser(username, firstname, lastname, emailaddress, password, roleid, function (err, result) {
+            user.createUser(User, function (err, result) {
+
                 if (err) {
-                    var error = new errhandler(err.code, err.message, err.stack);
-                    res.status(constants.SERVER_ERROR_CODE).json(error);
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(err));
+                    return;
                 } else {
-                    if (result.insertId) {
-                        var payload = new restobj("SUCCESS", "User created");
-                        res.json(payload);
+                    if (result) {
+                        res.json({
+                            success: true,
+                            message: "User created",
+                            id: result.insertId
+                        });
                     } else {
-                        var error = new errhandler('ERR001')
-                        res.status(constants.NO_RESULTS).json(error);
+                        res.json({
+                            success: false,
+                            message: "User not created"
+                        })
                     }
                 }
             });
         } else {
-            var error = new errhandler('ERR003')
-            res.status(constants.SERVER_ERROR_CODE).json(error);
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
     },
 
+    updateUser: function(req, res, next) {
+        var username = req.body.username;
+        var firstname = req.body.firstname;
+        var lastname = req.body.lastname;
+        var emailaddress = req.body.emailaddress;
+        var mobilenumber = req.body.mobilenumber;
+
+        // TODO: encrypt password
+        if (username && firstname && lastname && emailaddress) {
+            user.updateUser(username, firstname, lastname, emailaddress, mobilenumber, function (error, results) {
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+                if (results.changedRows === 1 || results.affectedRows === 1) {
+                    res.json({
+                        success: true,
+                        user: results[0]
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        user: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
     changeUserStatus: function (req, res, next) {
         var username = req.body.username;
         var status = req.body.status; // see aceconfig.groupid = 2

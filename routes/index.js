@@ -145,6 +145,7 @@ router.post('/login', auth.login);
 router.post('/changepasswd', user.changePassword);
 router.post('/createuser', user.createNewUser);
 
+
 /*
   /api/v1/users
  */
@@ -152,6 +153,7 @@ var apiversion = '/api/v1/';
 
 // User
 router.get(apiversion + 'user/getuserid/:username', user.getUserID);
+router.post(apiversion + 'user/update', user.updateUser);
 /**
  * @swagger
  * /api/v1/user/{username}:
@@ -251,6 +253,8 @@ router.post(apiversion + 'staff/update', staff.updateStaffDetails);
  *         description:
  */
 router.get(apiversion + 'staff/', staff.getAllStaff);
+
+router.get(apiversion + 'staff/search/', staff.searchStaff);
 /**
  * @swagger
  * /api/v1/staff/{username}:
@@ -874,6 +878,9 @@ router.post(apiversion + 'inspection/new', inspection.createNewInspection);
  */
 router.post(apiversion + 'inspection/email', inspection.sendInspectionEmail);
 
+// assign
+router.post(apiversion + 'claim/assign', claim.assignClaim);
+router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
 
 router.post(apiversion + 'sms/notify', smsapi.sendSMS);
 router.get(apiversion + 'address/search', addressapi.searchAddress);

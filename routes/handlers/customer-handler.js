@@ -161,7 +161,7 @@ var CustHandler = {
     updateCustomerDetails: function(req, res, next) {
         var Cust = new custObj();
 
-        Cust.customerid = req.body.customerid;
+        Cust.username = req.body.username;
         Cust.customertypeid = req.body.customertypeid;
         Cust.customername = req.body.customername;
         Cust.address1 = req.body.address1;
@@ -171,7 +171,8 @@ var CustHandler = {
         Cust.postcode = req.body.postcode;
         Cust.country = req.body.country;
 
-        if(Cust && Cust.customerid) {
+        console.log(Cust);
+        if(Cust.username) {
             customer.updateCustomer(Cust, function(error, results) {
                 if (error) {
                     res.status(constants.SERVER_ERROR_CODE).json(new errhandler(error.code, error.message, error.stack));

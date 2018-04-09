@@ -18,9 +18,10 @@ var customerDTO = {
     },
     getCustomerDetails: function(username, callback) {
         logger.info("query: getCustomerDetails [" + username + "]");
-        return db.query("SELECT customerid, customertypeid as custtypeid, longdesc as custtype, username, customername, address1, address2, suburb, state, postcode, country FROM customer " +
-            " LEFT JOIN aceconfig ON aceconfig.ordinal = customer.customertypeid AND groupid = ? " +
-            " WHERE username = ?", [CUSTTYPE_GID, username], callback);
+        return db.query("SELECT c.customerid, c.customertypeid as custtypeid, a.longdesc as custtype, c.username, u.mobilenumber, u.emailaddress, c.customername, c.address1, c.address2, c.suburb, c.state, c.postcode, c.country FROM customer c " +
+            " LEFT JOIN aceconfig a ON a.ordinal = c.customertypeid AND a.groupid = ? " +
+            " JOIN user u ON u.username = c.username" +
+            " WHERE c.username = ?", [CUSTTYPE_GID, username], callback);
     },
     getCustomerType: function(typeid, callback) {
         db.query("SELECT ordinal as typeid, longdesc as name FROM aceconfig WHERE groupid = ? AND ordinal = ?", [CUSTTYPE_GID, typeid], function(error, results){
@@ -47,9 +48,9 @@ var customerDTO = {
                     "state = ?, " +
                     "postcode = ?, " +
                     "country = ? " +
-                "WHERE customerid = ?",
+                "WHERE username = ?",
             [custObj.customertypeid, custObj.customername, custObj.address1, custObj.address2, custObj.suburb,
-             custObj.state, custObj.postcode, custObj.country, custObj.customerid], callback);
+             custObj.state, custObj.postcode, custObj.country, custObj.username], callback);
 
         // TODO: Insert to customerhistory - Any customer details changes
     }

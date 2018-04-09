@@ -21,7 +21,7 @@ var AttachmentDetObj = require('../../objects/worklog-object').AttachmentDetail;
 // Logger
 var logger = require('../../functions/logger');
 
-var uploadRootDir = __dirname + '../../../uploads/';
+var uploadRootDir = process.env.UPLOAD_DIRECTORY;
 
 function parseError(error) {
     switch (error.code) {
@@ -61,6 +61,7 @@ var WorkLogHandler = {
         }
 
 
+        console.log(WorkItem);
         // TODO: Add validations to json body
         if(WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
 
@@ -144,36 +145,104 @@ var WorkLogHandler = {
         }
     },
     updateWorkLogItem: function(req, res, next) {
-
+        // create new instance of WorkItemObj
         var WorkItem = new WorkItemObj();
 
+        // Define parameters json body
         WorkItem.workitemid = req.body.workitemid;
-        WorkItem.worklogid = req.body.worklogid;
-        WorkItem.worktype = req.body.worktype;
+        WorkItem.worklogid = parseInt(req.body.worklogid);
+        WorkItem.worktype = parseInt(req.body.worktype);
         WorkItem.description = req.body.description;
         WorkItem.notes = req.body.notes;
         WorkItem.username = req.body.username;
 
-        if(WorkItem.workitemid && WorkItem.worklogid && WorkItem.username) {
-            worklog.updateWorkLog(WorkItem, function(error, results) {
-                if (error) {
-                    // Handle basic error
+        // Attachment
+        var uploadFile;
+
+        if (req.files) {
+            uploadFile =  req.files.attachment;
+        }
+        console.log(WorkItem);
+        // TODO: Add validations to json body
+        if(WorkItem.workitemid && WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
+
+            // If there's an upload file
+            if (uploadFile) {
+
+                // Check if it's over the size limit
+                if(uploadFile.truncated) {
+                    error.code = "ERR500";
+                    error.message = "File too large!";
                     res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
                     return;
-                }
-                if (results.changedRows === 1 || results.affectedRows === 1) {
-
-                    res.json({
-                        success: true,
-                        workitem: WorkItem
-                    });
                 } else {
-                    res.json({
-                        success: false,
-                        workitem: null
+
+                    // Upload file to server
+                    logger.info("Uploading file to claims dir");
+                    // check directory if exists else create
+                    checkDir(uploadRootDir);
+                    var claimDir = uploadRootDir + WorkItem.worklogid + '/';
+                    checkDir(claimDir);
+
+                    var now = datetime.create();
+                    var datesuffix = now.format("Ymd-HMS");
+                    var ext = path.extname(uploadFile.name);
+                    WorkItem.attachment = 'attachment-' + datesuffix + ext;
+                    WorkItem.type = uploadFile.mimetype;
+
+                    uploadFile.mv(claimDir + WorkItem.attachment, function(error) {
+                        if (error) {
+                            res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                            return;
+                        }
+
+                        // Create workitem now
+                        worklog.updateWorkLog(WorkItem, function(error, result) {
+                            if (error) {
+                                // Handle basic error
+                                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                                return;
+                            }
+                            if (result) {
+                                WorkItem.itemid = result;
+                                res.json({
+                                    success: true,
+                                    workitem: WorkItem
+                                });
+                            } else {
+                                res.json({
+                                    success: false,
+                                    workitem: null
+                                });
+                            }
+                        });
                     });
                 }
-            });
+
+            } else {
+                // Create workitem now
+                worklog.updateWorkLog(WorkItem, function(error, result) {
+                    console.log(result);
+                    if (error) {
+                        // Handle basic error
+                        res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                        return;
+                    }
+
+                    if (result) {
+                        WorkItem.itemid = result;
+                        res.json({
+                            success: true,
+                            workitem: WorkItem
+                        });
+                    } else {
+                        res.json({
+                            success: false,
+                            workitem: null
+                        });
+                    }
+                });
+            }
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }

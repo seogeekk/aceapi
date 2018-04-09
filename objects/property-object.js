@@ -14,6 +14,7 @@ var latitude
 var longitude;
 var unit_type;
 var mesh_block;
+var submitteduser;
 
 module.exports = { Property, PropertyDetail };
 
@@ -21,6 +22,7 @@ module.exports = { Property, PropertyDetail };
 function Property() {
     this.propertyid = propertyid;
     this.property_canonical_id = property_canonical_id;
+    this.submitteduser = submitteduser;
     this.address1 = address1;
     this.address2 = address2;
     this.suburb = suburb;
@@ -37,6 +39,7 @@ function Property() {
 function PropertyDetail(Property) {
     this.propertyid = Property.propertyid;
     this.property_canonical_id = Property.property_canonical_id;
+    this.submitteduser = Property.submitteduser;
     this.address1 = Property.address1;
     this.address2 = Property.address2;
     this.suburb = Property.suburb;

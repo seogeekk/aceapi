@@ -36,11 +36,11 @@ var StaffHandler = {
         // Define parameters json body
         Staff.username = req.body.username;
         Staff.staffname = req.body.staffname;
-        Staff.department = parseInt(req.body.department);
+        Staff.department = parseInt(req.body.department) || undefined;
         Staff.accesstype = parseInt(req.body.accesstype);
 
         // TODO: Add validations to json body
-        if(Staff.username) {
+        if(Staff.username && Staff.accesstype && Staff.staffname) {
             staff.createNewStaff(Staff, function(error, results) {
                 if (error) {
                     // Handle basic error
@@ -71,11 +71,12 @@ var StaffHandler = {
         // Define parameters json body
         Staff.username = req.body.username;
         Staff.staffname = req.body.staffname;
-        Staff.department = parseInt(req.body.department);
+        Staff.department = parseInt(req.body.department) || undefined;
         Staff.accesstype = parseInt(req.body.accesstype);
 
+        console.log(Staff);
         // TODO: Add validations to json body
-        if(Staff.username) {
+        if(Staff.username && Staff.accesstype && Staff.staffname) {
             staff.updateStaffDetails(Staff, function(error, results) {
                 if (error) {
                     // Handle basic error
@@ -163,6 +164,38 @@ var StaffHandler = {
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
+    },
+    searchStaff: function(req, res, next) {
+        var query = req.query.query;
+
+        console.log(query);
+        staff.searchStaff(query, function(error, results) {
+            console.log(results);
+            if (error) {
+                // Handle basic error
+                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                return;
+            }
+
+            logger.info("searchStaff() ret: " + results.length);
+            var rows = [];
+            for (var i = 0; i < results.length; i++) {
+                rows.push(new staffDetObj(results[i]));
+            }
+
+            if(results.length > 0) {
+                res.json({
+                    success: true,
+                    staff: rows
+                });
+
+            } else {
+                res.json({
+                    success: false,
+                    staff: null
+                })
+            }
+        });
     }
 };
 

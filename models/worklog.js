@@ -31,7 +31,7 @@ var WorkLogDTO = {
                 connection.query("INSERT INTO workloghistory (worklogid, worktype, description, notes, auditwho, auditwhen) VALUES (?,?,?,?,?,?)",
                     [workItem.worklogid, workItem.worktype, workItem.description, workItem.notes, workItem.username, auditdate], function(err, result) {
                         if(err) {
-                            connection.rollback(function() {
+                            return connection.rollback(function() {
                                 callback(err);
                             });
                         }
@@ -42,7 +42,7 @@ var WorkLogDTO = {
                             logger.debug("trans(" + trans_id + "): insert into attachment");
                             connection.query("INSERT INTO attachment (attachment, type, auditwho, auditwhen) VALUES(?,?,?,?)", [workItem.attachment, workItem.attachmenttype, workItem.username, auditdate], function(err, result) {
                                 if (err) {
-                                    connection.rollback(function() {
+                                    return connection.rollback(function() {
                                         callback(err);
                                     });
                                 }
@@ -52,31 +52,33 @@ var WorkLogDTO = {
                                 logger.debug("trans(" + trans_id + "): insert into worklogattachrel");
                                 connection.query("INSERT INTO worklogattachrel(workitemid, itemid) VALUES (?, ?)", [workitemid, itemid], function(err, result) {
                                     if (err) {
-                                        connection.rollback(function() {
+                                        return connection.rollback(function() {
                                             callback(err);
                                         });
                                     }
                                     // commit transaction
-                                    connection.commit(function(err) {
+                                    return connection.commit(function(err) {
                                         if(err) {
-                                            connection.rollback(function() {
+                                            return connection.rollback(function() {
                                                 callback(err);
                                             });
                                         }
                                         logger.debug("end_transaction(" + trans_id+ ")");
+                                        connection.release();
                                         callback(null, workitemid);
                                     });
                                 });
                             });
                         } else {
                             // commit transaction
-                            connection.commit(function(err) {
+                            return connection.commit(function(err) {
                                 if(err) {
-                                    connection.rollback(function() {
+                                    return connection.rollback(function() {
                                         callback(err);
                                     });
                                 }
                                 logger.debug("end_transaction(" + trans_id+ ")");
+                                connection.release();
                                 callback(null, workitemid);
                             });
                         }
@@ -135,15 +137,87 @@ var WorkLogDTO = {
         var now = datetime.create();
         var auditdate = now.format("Y-m-d H:M:S");
 
-        logger.info("query: updateWorklog[]");
-        db.query("UPDATE workloghistory " +
-                 "SET worktype = ?," +
+        logger.info("query: updateWorkLog[]");
+        db.getConnection(function(err, connection) {
+            connection.beginTransaction(function(err) {
+
+                var trans_id = uuid.v1();
+
+                logger.debug("start_transaction(" + trans_id + ")");
+                if(err) { callback(err); }
+                // Insert into query
+                var now = datetime.create();
+                var auditdate = now.format("Y-m-d H:M:S");
+                logger.debug("trans(" + trans_id + "): insert into workloghistory");
+                connection.query("UPDATE workloghistory " +
+                    "SET worktype = ?," +
                     "description = ?," +
                     "notes = ?," +
                     "auditwho = ?," +
-                    "auditwhen = ?, " +
-                 "WHERE workitemid = ?",
-            [workItem.worktype, workItem.description, workItem.notes, workItem.username, auditdate, workItem.workitemid], callback);
+                    "auditwhen = ? " +
+                    "WHERE workitemid = ?",
+                    [workItem.worktype, workItem.description, workItem.notes, workItem.username, auditdate, workItem.workitemid], function(err, result) {
+                        if(err) {
+                            return connection.rollback(function() {
+                                callback(err);
+                            });
+                        }
+
+                        var workitemid = workItem.workitemid;
+
+                        // if there's attachment
+                        if (workItem.attachment) {
+                            logger.debug("trans(" + trans_id + "): insert into attachment");
+                            connection.query("INSERT INTO attachment (attachment, type, auditwho, auditwhen) VALUES(?,?,?,?)", [workItem.attachment, workItem.attachmenttype, workItem.username, auditdate], function(err, result) {
+                                if (err) {
+                                    return connection.rollback(function() {
+                                        callback(err);
+                                    });
+                                }
+                                var itemid = result.insertId;
+
+                                // create relationship
+                                logger.debug("trans(" + trans_id + "): insert into worklogattachrel");
+                                connection.query("INSERT INTO worklogattachrel(workitemid, itemid) VALUES (?, ?)", [workitemid, itemid], function(err, result) {
+                                    if (err) {
+                                        return connection.rollback(function() {
+                                            callback(err);
+                                        });
+                                    }
+                                    // commit transaction
+                                    return connection.commit(function(err) {
+                                        if(err) {
+                                            return connection.rollback(function() {
+                                                callback(err);
+                                            });
+                                        }
+                                        logger.debug("end_transaction(" + trans_id+ ")");
+                                        connection.release();
+                                        callback(null, workitemid);
+                                    });
+                                });
+                            });
+                        } else {
+                            // commit transaction
+                            return connection.commit(function(err) {
+                                if(err) {
+                                    return connection.rollback(function() {
+                                        callback(err);
+                                    });
+                                }
+                                logger.debug("end_transaction(" + trans_id+ ")");
+                                connection.release();
+                                callback(null, workitemid);
+                            });
+                        }
+
+                    });
+            });
+        });
+
+
+
+
     },
     updateAttachment: function(Attachment, callback) {
         var now = datetime.create();

@@ -74,25 +74,23 @@ INSERT INTO aceconfig_group
 VALUES (4, 'Claim Status', '0', @l_user);
 
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 1, 'Open', @l_user);
+				VALUES(4, 1, 'Open', @l_user); -- 10%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 2, 'Assigned', @l_user);
+				VALUES(4, 2, 'Assigned', @l_user); -- 20%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 3, 'In Review', @l_user);
+				VALUES(4, 3, 'In Review', @l_user); -- 40%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 4, 'For Inspection', @l_user);
+				VALUES(4, 4, 'For Approval', @l_user); -- 50%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 5, 'For Approval', @l_user);
+				VALUES(4, 5, 'Approved', @l_user); -- 70%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 6, 'Scheduled to Action', @l_user);
+				VALUES(4, 6, 'Schedule for Action', @l_user); -- 85%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 7, 'Action Completed', @l_user);
+				VALUES(4, 7, 'Closed', @l_user); -- 100%
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 8, 'Closed', @l_user);
+				VALUES(4, 8, 'Rejected', @l_user);
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 9, 'Rejected', @l_user);
-INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(4, 10, 'Cancelled', @l_user);
+				VALUES(4, 9, 'Cancelled', @l_user);
 
 select * from aceconfig where groupid = 4;
 
@@ -160,9 +158,9 @@ INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho)
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
 				VALUES(@l_groupid, 2, 'Manager', @l_user);
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(@l_groupid, 3, 'Approver', @l_user);
+				VALUES(@l_groupid, 3, 'Approver', @l_user); 
 INSERT INTO aceconfig (groupid, ordinal, longdesc, auditwho) 
-				VALUES(@l_groupid, 4, 'Head', @l_user);
+				VALUES(@l_groupid, 4, 'Head', @l_user); -- Admin
 
 select * from aceconfig where groupid = @l_groupid;
 

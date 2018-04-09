@@ -13,6 +13,10 @@ var suburb;
 var state;
 var postcode;
 var country;
+
+var mobilenumber;
+var emailaddress;
+
 var custtype;
 
 var customertypeid;
@@ -30,6 +34,8 @@ function Customer(custid) {
     this.customertypeid = custtypeid;
     this.custclass = custclass;
     this.username = username;
+    this.mobilenumber = mobilenumber;
+    this.emailaddress = emailaddress;
     this.customername = custname;
     this.address1 = address1;
     this.address2 = address2;
@@ -45,6 +51,8 @@ function CustomerDetails(Customer) {
     this.custclass = Customer.custclass;
     this.username = Customer.username;
     this.customername = Customer.customername;
+    this.emailaddress = Customer.emailaddress;
+    this.mobilenumber = Customer.mobilenumber;
     this.address1 = Customer.address1;
     this.address2 = Customer.address2;
     this.suburb = Customer.suburb;
