@@ -81,6 +81,7 @@ var ClaimDTO = {
                         "description," +
                         "submitteddate," +
                         "submitteduser," +
+                        "submittedname," +
                         "status," +
                         "statusname," +
                         "reviewstartdate," +
@@ -116,6 +117,7 @@ var ClaimDTO = {
                         "description," +
                         "submitteddate," +
                         "submitteduser," +
+                        "submittedname," +
                         "status," +
                         "statusname," +
                         "reviewstartdate," +
@@ -150,6 +152,7 @@ var ClaimDTO = {
             "description," +
             "submitteddate," +
             "submitteduser," +
+            "submittedname," +
             "status," +
             "statusname," +
             "reviewstartdate," +

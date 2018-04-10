@@ -36,7 +36,7 @@ module.exports = function(req, res, next) {
 
                 if (dbUser) {
                     // Login User Access
-                    //logger.info("user access: " + dbUser.username  + ", page: " + req.url);
+                    // logger.info("user access: " + dbUser.username  + ", page: " + req.url);
                     // TODO: Fix catch Exception
                     logUserAccess(dbUser.username, ipaddress, req.url, function(error, results) {
                         if (error) {

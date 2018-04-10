@@ -41,10 +41,8 @@ function checkDir(directory) {
     }
 }
 
-
 var WorkLogHandler = {
     createNewWorkItem: function(req, res, next) {
-
         // create new instance of WorkItemObj
         var WorkItem = new WorkItemObj();
 
@@ -54,50 +52,52 @@ var WorkLogHandler = {
         WorkItem.description = req.body.description;
         WorkItem.notes = req.body.notes;
         WorkItem.username = req.body.username;
+        // Optional
+        WorkItem.inspectiondate = new Date(req.body.inspectiondate);
 
-        // Attachment
+        // Attachment - Get attachment, if any
         var uploadFile;
-
-        if (req.files) {
-            uploadFile =  req.files.attachment;
-        }
-
+        if (req.files) { uploadFile =  req.files.attachment; }
 
         console.log(WorkItem);
         // TODO: Add validations to json body
-        if(WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
-
+        logger.info("createNewWorkItem()", req.id);
+        // Validate parameters
+        if (WorkItem.worktype == 2 && isNaN(WorkItem.inspectiondate.getTime())) {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+        else if(WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
             // If there's an upload file
             if (uploadFile) {
 
-                // Check if it's over the size limit
                 if(uploadFile.truncated) {
+                    // Check if it's over the size limit
                     error.code = "ERR500";
                     error.message = "File too large!";
                     res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
                     return;
                 } else {
-
                     // Upload file to server
-                    logger.info("Uploading file to claims dir");
+                    logger.info("Uploading file to claims dir: " + uploadFile.name);
                     // check directory if exists else create
                     checkDir(uploadRootDir);
                     var claimDir = uploadRootDir + WorkItem.worklogid + '/';
                     checkDir(claimDir);
 
+                    // Build attachment filename
                     var now = datetime.create();
                     var datesuffix = now.format("Ymd-HMS");
                     var ext = path.extname(uploadFile.name);
                     WorkItem.attachment = 'attachment-' + datesuffix + ext;
                     WorkItem.type = uploadFile.mimetype;
 
+                    // 1. Copy to server
                     uploadFile.mv(claimDir + WorkItem.attachment, function(error) {
                         if (error) {
                             res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
                             return;
                         }
-
-                        // Create workitem now
+                        // 2. Create workitem
                         worklog.createNewWorkLog(WorkItem, function(error, result) {
                             if (error) {
                                 // Handle basic error
@@ -121,7 +121,7 @@ var WorkLogHandler = {
                 }
 
             } else {
-                // Create workitem now
+                // 1. Create workitem now
                 worklog.createNewWorkLog(WorkItem, function(error, result) {
                     if (error) {
                         // Handle basic error
@@ -157,16 +157,19 @@ var WorkLogHandler = {
         WorkItem.description = req.body.description;
         WorkItem.notes = req.body.notes;
         WorkItem.username = req.body.username;
+        WorkItem.inspectiondate = new Date(req.body.inspectiondate);
+        WorkItem.inspectionid = req.body.inspectionid;
 
-        // Attachment
+        // Attachment - Get attachment, if any
         var uploadFile;
+        if (req.files) { uploadFile =  req.files.attachment; }
 
-        if (req.files) {
-            uploadFile =  req.files.attachment;
-        }
         console.log(WorkItem);
-        // TODO: Add validations to json body
-        if(WorkItem.workitemid && WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
+        // Validate parameters
+        if (WorkItem.worktype == 2 && isNaN(WorkItem.inspectiondate.getTime()) && WorkItem.inspectionid) {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+        else if(WorkItem.workitemid && WorkItem.worklogid && WorkItem.worktype && WorkItem.description && WorkItem.username) {
 
             // If there's an upload file
             if (uploadFile) {
@@ -180,7 +183,7 @@ var WorkLogHandler = {
                 } else {
 
                     // Upload file to server
-                    logger.info("Uploading file to claims dir");
+                    logger.info("Uploading file to claims dir: " + uploadFile.name, req.id);
                     // check directory if exists else create
                     checkDir(uploadRootDir);
                     var claimDir = uploadRootDir + WorkItem.worklogid + '/';
@@ -274,7 +277,6 @@ var WorkLogHandler = {
                 }
 
                 if (results.length > 0) {
-
                     res.json({
                         success: true,
                         workitems: rows

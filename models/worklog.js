@@ -5,8 +5,6 @@
 var db = require('../functions/dbconnect');
 var logger = require('../functions/logger');
 
-var uuid = require('node-uuid');
-
 var datetime = require('node-datetime');
 
 const ATTACHMENTTYPE_GID = 10;
@@ -15,19 +13,19 @@ const WORKTYPE_GID = 11;
 var WorkLogDTO = {
     createNewWorkLog: function(workItem, callback) {
 
-        logger.info("query: createNewWorkLog[]");
 
+        logger.debug("createNewWorkLog()");
+        // Start new transaction
         db.getConnection(function(err, connection) {
+            logger.debug("beginTransaction()");
             connection.beginTransaction(function(err) {
-
-                var trans_id = uuid.v1();
-
-                logger.debug("start_transaction(" + trans_id + ")");
                 if(err) { callback(err); }
-                // Insert into query
+
                 var now = datetime.create();
                 var auditdate = now.format("Y-m-d H:M:S");
-                logger.debug("trans(" + trans_id + "): insert into workloghistory");
+
+                // 1. Insert into workloghistory
+                logger.debug("trans() : insert into workloghistory");
                 connection.query("INSERT INTO workloghistory (worklogid, worktype, description, notes, auditwho, auditwhen) VALUES (?,?,?,?,?,?)",
                     [workItem.worklogid, workItem.worktype, workItem.description, workItem.notes, workItem.username, auditdate], function(err, result) {
                         if(err) {
@@ -35,60 +33,149 @@ var WorkLogDTO = {
                                 callback(err);
                             });
                         }
-                        var workitemid = result.insertId;
 
-                        // if there's attachment
+                        // 2. Get new workitem id
+                        var workitemid;
+                        if(result) {
+                            workitemid = result.insertId;
+                        }
+                        else {
+                            return connection.rollback(function() {
+                                callback(new Error("Workitem insert failed"));
+                            });
+                        }
+
+                        // 3. If there's attachment upload,
+                        // else commit transaction and return workitem id
                         if (workItem.attachment) {
-                            logger.debug("trans(" + trans_id + "): insert into attachment");
+                            // 3a. Insert into attachment
+                            logger.debug("trans(): insert into attachment");
                             connection.query("INSERT INTO attachment (attachment, type, auditwho, auditwhen) VALUES(?,?,?,?)", [workItem.attachment, workItem.attachmenttype, workItem.username, auditdate], function(err, result) {
                                 if (err) {
                                     return connection.rollback(function() {
                                         callback(err);
                                     });
                                 }
-                                var itemid = result.insertId;
 
-                                // create relationship
-                                logger.debug("trans(" + trans_id + "): insert into worklogattachrel");
+                                // 3b. Get new attachment id
+                                var itemid;
+                                if(result) {
+                                    itemid = result.insertId;
+                                }
+                                else {
+                                    return connection.rollback(function() {
+                                        callback(new Error("Attachment insert failed"));
+                                    });
+                                }
+
+                                // TODO: Check if there's existing attachment relationship - Remove if any
+                                // 3c. create relationship
+                                logger.debug("trans(): insert into worklogattachrel");
                                 connection.query("INSERT INTO worklogattachrel(workitemid, itemid) VALUES (?, ?)", [workitemid, itemid], function(err, result) {
                                     if (err) {
                                         return connection.rollback(function() {
                                             callback(err);
                                         });
                                     }
-                                    // commit transaction
-                                    return connection.commit(function(err) {
-                                        if(err) {
+
+                                    // 3d. If worktype == 2 (Inspection)
+                                    // else commit transaction
+                                    if (workItem.worktype == 2) {
+                                        logger.debug("trans(): insert into inspection");
+                                        connection.query("INSERT INTO inspection (workitemid, description, inspectiondate, auditwho, auditwhen) " +
+                                            "VALUES(?,?,?,?,?)",
+                                            [
+                                                workitemid,
+                                                workItem.description,
+                                                workItem.inspectiondate,
+                                                workItem.username,
+                                                auditdate
+                                            ], function(err, result) {
+                                                if (err) {
+                                                    return connection.rollback(function() {
+                                                        callback(err);
+                                                    });
+                                                }
+
+                                                // 3e. Commit transaction and return workitem id
+                                                return connection.commit(function(err) {
+                                                    if(err) {
+                                                        return connection.rollback(function() {
+                                                            callback(err);
+                                                        });
+                                                    }
+
+                                                    logger.debug("end_transaction()");
+                                                    connection.release();
+                                                    callback(null, workitemid);
+                                                });
+                                            });
+                                    } else {
+                                        return connection.commit(function(err) {
+                                            if(err) {
+                                                return connection.rollback(function() {
+                                                    callback(err);
+                                                });
+                                            }
+
+                                            logger.debug("end_transaction()");
+                                            connection.release();
+                                            callback(null, workitemid);
+                                        });
+                                    }
+
+                                });
+                            });
+                        } else {
+                            // 3a. If worktype == 2 (Inspection)
+                            // else commit transaction
+                            if (workItem.worktype == 2) {
+                                logger.debug("trans(): insert into inspection");
+                                connection.query("INSERT INTO inspection (workitemid, description, inspectiondate, auditwho, auditwhen) " +
+                                    "VALUES(?,?,?,?,?)",
+                                    [
+                                        workitemid,
+                                        workItem.notes,
+                                        workItem.inspectiondate,
+                                        workItem.username,
+                                        auditdate
+                                    ], function(err, result) {
+                                        if (err) {
                                             return connection.rollback(function() {
                                                 callback(err);
                                             });
                                         }
-                                        logger.debug("end_transaction(" + trans_id+ ")");
-                                        connection.release();
-                                        callback(null, workitemid);
-                                    });
-                                });
-                            });
-                        } else {
-                            // commit transaction
-                            return connection.commit(function(err) {
-                                if(err) {
-                                    return connection.rollback(function() {
-                                        callback(err);
-                                    });
-                                }
-                                logger.debug("end_transaction(" + trans_id+ ")");
-                                connection.release();
-                                callback(null, workitemid);
-                            });
-                        }
 
+                                        // 3b. Commit transaction and return workitem id
+                                        return connection.commit(function(err) {
+                                            if(err) {
+                                                return connection.rollback(function() {
+                                                    callback(err);
+                                                });
+                                            }
+
+                                            logger.debug("end_transaction()");
+                                            connection.release();
+                                            callback(null, workitemid);
+                                        });
+                                    });
+                            } else {
+                                return connection.commit(function(err) {
+                                    if(err) {
+                                        return connection.rollback(function() {
+                                            callback(err);
+                                        });
+                                    }
+
+                                    logger.debug("end_transaction()");
+                                    connection.release();
+                                    callback(null, workitemid);
+                                });
+                            }
+                        }
                     });
             });
         });
-
-
-
     },
     createNewAttachment: function(Attachment, callback) {
 
@@ -140,15 +227,12 @@ var WorkLogDTO = {
         logger.info("query: updateWorkLog[]");
         db.getConnection(function(err, connection) {
             connection.beginTransaction(function(err) {
-
-                var trans_id = uuid.v1();
-
-                logger.debug("start_transaction(" + trans_id + ")");
+                logger.debug("start_transaction()");
                 if(err) { callback(err); }
                 // Insert into query
                 var now = datetime.create();
                 var auditdate = now.format("Y-m-d H:M:S");
-                logger.debug("trans(" + trans_id + "): insert into workloghistory");
+                logger.debug("trans(): insert into workloghistory");
                 connection.query("UPDATE workloghistory " +
                     "SET worktype = ?," +
                     "description = ?," +
@@ -167,7 +251,7 @@ var WorkLogDTO = {
 
                         // if there's attachment
                         if (workItem.attachment) {
-                            logger.debug("trans(" + trans_id + "): insert into attachment");
+                            logger.debug("trans(): insert into attachment");
                             connection.query("INSERT INTO attachment (attachment, type, auditwho, auditwhen) VALUES(?,?,?,?)", [workItem.attachment, workItem.attachmenttype, workItem.username, auditdate], function(err, result) {
                                 if (err) {
                                     return connection.rollback(function() {
@@ -177,38 +261,104 @@ var WorkLogDTO = {
                                 var itemid = result.insertId;
 
                                 // create relationship
-                                logger.debug("trans(" + trans_id + "): insert into worklogattachrel");
+                                logger.debug("trans(): insert into worklogattachrel");
                                 connection.query("INSERT INTO worklogattachrel(workitemid, itemid) VALUES (?, ?)", [workitemid, itemid], function(err, result) {
                                     if (err) {
                                         return connection.rollback(function() {
                                             callback(err);
                                         });
                                     }
-                                    // commit transaction
-                                    return connection.commit(function(err) {
-                                        if(err) {
+
+
+                                    if (workItem.worktype == 2) {
+                                        logger.debug("trans(): update inspection");
+
+                                        connection.query("UPDATE inspection SET description = ?, inspectiondate = ?, auditwho = ?, auditwhen = ? WHERE inspectionid = ? ",
+                                            [
+                                                workItem.description,
+                                                workItem.inspectiondate,
+                                                workItem.username,
+                                                auditdate,
+                                                workItem.inspectionid
+                                            ], function(err, result) {
+                                                if (err) {
+                                                    return connection.rollback(function() {
+                                                        callback(err);
+                                                    });
+                                                }
+
+                                                // 3e. Commit transaction and return workitem id
+                                                return connection.commit(function(err) {
+                                                    if(err) {
+                                                        return connection.rollback(function() {
+                                                            callback(err);
+                                                        });
+                                                    }
+
+                                                    logger.debug("end_transaction()");
+                                                    connection.release();
+                                                    callback(null, workitemid);
+                                                });
+                                            });
+                                    } else {
+                                        return connection.commit(function(err) {
+                                            if(err) {
+                                                return connection.rollback(function() {
+                                                    callback(err);
+                                                });
+                                            }
+
+                                            logger.debug("end_transaction()");
+                                            connection.release();
+                                            callback(null, workitemid);
+                                        });
+                                    }
+                                });
+                            });
+                        } else {
+                            if (workItem.worktype == 2) {
+                                logger.debug("trans(): update inspection");
+
+                                connection.query("UPDATE inspection SET description = ?, inspectiondate = ?, auditwho = ?, auditwhen = ? WHERE inspectionid = ? ",
+                                    [
+                                        workItem.description,
+                                        workItem.inspectiondate,
+                                        workItem.username,
+                                        auditdate,
+                                        workItem.inspectionid
+                                    ], function(err, result) {
+                                        if (err) {
                                             return connection.rollback(function() {
                                                 callback(err);
                                             });
                                         }
-                                        logger.debug("end_transaction(" + trans_id+ ")");
-                                        connection.release();
-                                        callback(null, workitemid);
+
+                                        // 3e. Commit transaction and return workitem id
+                                        return connection.commit(function(err) {
+                                            if(err) {
+                                                return connection.rollback(function() {
+                                                    callback(err);
+                                                });
+                                            }
+
+                                            logger.debug("end_transaction()");
+                                            connection.release();
+                                            callback(null, workitemid);
+                                        });
                                     });
+                            } else {
+                                return connection.commit(function(err) {
+                                    if(err) {
+                                        return connection.rollback(function() {
+                                            callback(err);
+                                        });
+                                    }
+
+                                    logger.debug("end_transaction()");
+                                    connection.release();
+                                    callback(null, workitemid);
                                 });
-                            });
-                        } else {
-                            // commit transaction
-                            return connection.commit(function(err) {
-                                if(err) {
-                                    return connection.rollback(function() {
-                                        callback(err);
-                                    });
-                                }
-                                logger.debug("end_transaction(" + trans_id+ ")");
-                                connection.release();
-                                callback(null, workitemid);
-                            });
+                            }
                         }
 
                     });
@@ -245,14 +395,16 @@ var WorkLogDTO = {
     getAllWorkItemLog: function(worklogid, callback) {
         logger.info("query: getAllWorkItemLog["+worklogid+"]");
         db.query("SELECT workitemid, worklogid, worktype, worktypename, creationdate, description, notes, auditwho, auditwhen," +
-            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen " +
+            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen, inspectionid, inspectiondesc, inspectionresp, inspectioncreatedate," +
+            "inspectionrespdate, inspectiondate, inspectionwho, inspectionwhen " +
             "FROM workitemdetails " +
             "WHERE worklogid = ?", [worklogid], callback);
     },
     getWorkItemLog: function(workitemid, callback) {
-        logger.info("query: getAllWorkItemLog["+worklogid+"]");
+        logger.info("query: getWorkItemLog["+workitemid+"]");
         db.query("SELECT workitemid, worklogid, worktype, worktypename, creationdate, description, notes, auditwho, auditwhen," +
-            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen " +
+            "itemid, attachment, attachmenttype, filetypename, attachwho, attachwhen, inspectionid, inspectiondesc, inspectionresp, inspectioncreatedate," +
+            "inspectionrespdate, inspectiondate, inspectionwho, inspectionwhen " +
             "FROM workitemdetails " +
             "WHERE workitemid = ?", [workitemid], callback);
     }

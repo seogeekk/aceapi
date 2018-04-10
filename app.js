@@ -7,10 +7,7 @@ var bodyParser = require('body-parser');
 var fileUpload = require('express-fileupload');
 var cors = require('cors');
 
-// logger-related
-// var uuid = require('node-uuid');
-// var cls = require('continuation-local-storage');
-// var namespace = cls.createNamespace('my request');
+
 
 // routes
 var index = require('./routes/index');
@@ -24,7 +21,23 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(cors());
+
+var addRequestId = require('express-request-id')();
+
+app.use(addRequestId);
+
+// set-up access logging
+var fs = require('fs');
+var requestLogDir = process.env.REQUEST_DIRECTORY;
+if (!fs.existsSync(requestLogDir)){
+    logger.debug("Creating directory: " + requestLogDir);
+    fs.mkdirSync(requestLogDir);
+}
+var accessLogStream = fs.createWriteStream(path.join(requestLogDir, 'access.log'), {flags: 'a'})
 app.use(logger('dev'));
+app.use(logger(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms', {stream: accessLogStream}));
+
+// body parser and file upload
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -47,7 +60,6 @@ var options = {
 
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
 var swaggerSpec = swaggerJSDoc(options);
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // swaggerUi.runner.config.swagger.securityHandlers = {
 //     apikey1: function (req, authOrSecDef, scopesOrApiKey, callback) {
@@ -59,12 +71,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // swaggerUi.register(app);
 
 // Run the context for each request. Assign a unique identifier to each request
-// app.use(function(req, res, next) {
-//     namespace.run(function() {
-//         namespace.set('reqId', uuid.v1());
-//         next();
-//     })
-// });
+/*
+app.use(function(req, res, next) {
+
+});
+*/
 
 // Auth Middleware
 app.all('/api/*', [require('./middlewares/validateRequest')]);

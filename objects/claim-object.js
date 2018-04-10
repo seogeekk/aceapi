@@ -74,6 +74,7 @@ function ClaimDetail(Claim) {
     this.description = Claim.description;
     this.submitteddate = Claim.submitteddate;
     this.submitteduser = Claim.submitteduser;
+    this.submittedname = Claim.submittedname;
     this.status = {
         statusid: Claim.status,
         statusname: Claim.statusname

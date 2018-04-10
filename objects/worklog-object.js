@@ -9,6 +9,8 @@ var description;
 var notes;
 var auditwho;
 var auditwhen;
+var inspectiondate;
+var inspectionid;
 
 module.exports = { WorkItem, WorkItemDetail, Attachment, AttachmentDetail };
 
@@ -18,6 +20,8 @@ function WorkItem() {
     this.worktype = worktype;
     this.creationdate = Date.parse(creationdate);
     this.description = description;
+    this.inspectionid = inspectionid;
+    this.inspectiondate = Date.parse(inspectiondate);
     this.notes = notes;
     this.auditwho = auditwho;
     this.auditwhen = Date.parse(auditwhen);
@@ -44,7 +48,21 @@ function WorkItemDetail(workItem) {
             typeext: workItem.filetypename
         },
         auditwho: workItem.attachwho,
-        auditwhen: workItem.attachwhen
+        auditwhen: Date.parse(workItem.attachwhen)
+    }
+
+    this.inspection = {
+        inspectionid: workItem.inspectionid,
+        description: workItem.inspectiondesc,
+        response: {
+            code: workItem.inspectionresp,
+            date: Date.parse(workItem.inspectionrespdate)
+        },
+        submitteddate: Date.parse(workItem.inspectioncreatedate),
+        inspectiondate: Date.parse(workItem.inspectiondate),
+        auditwho: workItem.inspectionwho,
+        auditwhen: Date.parse(workItem.inspectionwhen)
+
     }
 
 }

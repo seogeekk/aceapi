@@ -168,16 +168,15 @@ var StaffHandler = {
     searchStaff: function(req, res, next) {
         var query = req.query.query;
 
-        console.log(query);
+        logger.debug(query, req.id);
         staff.searchStaff(query, function(error, results) {
-            console.log(results);
             if (error) {
                 // Handle basic error
                 res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
                 return;
             }
 
-            logger.info("searchStaff() ret: " + results.length);
+            logger.info("searchStaff() ret: " + results.length, req.id);
             var rows = [];
             for (var i = 0; i < results.length; i++) {
                 rows.push(new staffDetObj(results[i]));
