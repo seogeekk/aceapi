@@ -30,7 +30,6 @@ app.use(addRequestId);
 var fs = require('fs');
 var requestLogDir = process.env.REQUEST_DIRECTORY;
 if (!fs.existsSync(requestLogDir)){
-    logger.debug("Creating directory: " + requestLogDir);
     fs.mkdirSync(requestLogDir);
 }
 var accessLogStream = fs.createWriteStream(path.join(requestLogDir, 'access.log'), {flags: 'a'})
