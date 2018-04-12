@@ -4,7 +4,7 @@ var nodemailer = require('nodemailer');
 var handlebars = require('handlebars');
 var fs = require('fs');
 
-const aceemail = '"Ace Body" <acebodyonline@gmail.com>';
+const aceemail = '"Ace Body" <donotreply-mailer@acebodyonline.com>';
 
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -27,19 +27,18 @@ var readHTMLFile = function(path, callback) {
     })
 };
 
-function sendNewInspectionMail (recipient, custname, address, inspectiondate, claimid, summary, callback) {
+function sendInspectionMail (MailDetails, callback) {
 
     readHTMLFile(__dirname + './../templates/inspection.html', function(err, html) {
         var template = handlebars.compile(html);
 
         var replacements = {
-            customer: custname,
-            property: address,
-            inspectiondate: inspectiondate,
-            claimid: claimid,
-            summary: summary,
-            accepturl : '',
-            declineurl: ''
+            customer: MailDetails.custname,
+            property: MailDetails.address,
+            inspectiondate: MailDetails.inspectiondate,
+            claimid: MailDetails.claimid,
+            summary: MailDetails.summary,
+            accepturl : MailDetails.accepturl
         }
 
         var htmlToSend = template(replacements);
@@ -64,5 +63,72 @@ function sendNewInspectionMail (recipient, custname, address, inspectiondate, cl
 
 }
 
+function sendStatusMail (MailDetails, callback) {
 
-module.exports = { sendNewInspectionMail };
+    readHTMLFile(__dirname + './../templates/claimnotification.html', function(err, html) {
+        var template = handlebars.compile(html);
+
+        var replacements = {
+            customer: MailDetails.custname,
+            property: MailDetails.address,
+            claimid: MailDetails.claimid,
+            summary: MailDetails.summary,
+            accepturl : MailDetails.accepturl
+        }
+
+        var htmlToSend = template(replacements);
+
+        var mailOptions = {
+            from: aceemail,
+            to: recipient,
+            subject: 'Request ' + MailDetails.claimid + ' - Status Update',
+            html: htmlToSend
+        };
+
+        console.log(mailOptions);
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if(error) {
+                callback(error);
+            }
+            console.log(info);
+            callback(null, info);
+        });
+    });
+
+}
+
+function sendMailVerification (MailDetails, callback) {
+
+    readHTMLFile(__dirname + './../templates/verifyemail.html', function(err, html) {
+        var template = handlebars.compile(html);
+
+        var replacements = {
+            customer: MailDetails.custname,
+            accepturl : MailDetails.accepturl
+        }
+
+        var htmlToSend = template(replacements);
+
+        var mailOptions = {
+            from: aceemail,
+            to: recipient,
+            subject: 'Ace Body Online - Verify Email',
+            html: htmlToSend
+        };
+
+        console.log(mailOptions);
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if(error) {
+                callback(error);
+            }
+            console.log(info);
+            callback(null, info);
+        });
+    });
+
+}
+
+
+module.exports = { sendInspectionMail, sendStatusMail };
