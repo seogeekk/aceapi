@@ -29,7 +29,7 @@ var readHTMLFile = function(path, callback) {
 
 function sendInspectionMail (MailDetails, callback) {
 
-    readHTMLFile(__dirname + './../templates/inspection.html', function(err, html) {
+    readHTMLFile(__dirname + '/../templates/inspection.html', function(err, html) {
         var template = handlebars.compile(html);
 
         var replacements = {
@@ -64,7 +64,7 @@ function sendInspectionMail (MailDetails, callback) {
 
 function sendStatusMail (MailDetails, callback) {
 
-    readHTMLFile(__dirname + './../templates/claimnotification.html', function(err, html) {
+    readHTMLFile(__dirname + '/../templates/claimnotification.html', function(err, html) {
         var template = handlebars.compile(html);
 
         var replacements = {
@@ -99,7 +99,7 @@ function sendStatusMail (MailDetails, callback) {
 
 function sendMailVerification (MailDetails, callback) {
 
-    readHTMLFile(__dirname + './../templates/verifyemail.html', function(err, html) {
+    readHTMLFile(__dirname + '/../templates/verifyemail.html', function(err, html) {
         var template = handlebars.compile(html);
 
         var replacements = {
