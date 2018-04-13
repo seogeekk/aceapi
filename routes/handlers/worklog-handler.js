@@ -105,7 +105,7 @@ var WorkLogHandler = {
                                 return;
                             }
                             if (result) {
-                                WorkItem.itemid = result;
+                                WorkItem.workitemid = result;
                                 res.json({
                                     success: true,
                                     workitem: WorkItem
@@ -129,7 +129,7 @@ var WorkLogHandler = {
                         return;
                     }
                     if (result) {
-                        WorkItem.itemid = result;
+                        WorkItem.workitemid = result;
                         res.json({
                             success: true,
                             workitem: WorkItem
@@ -209,7 +209,7 @@ var WorkLogHandler = {
                                 return;
                             }
                             if (result) {
-                                WorkItem.itemid = result;
+                                WorkItem.workitemid = result;
                                 res.json({
                                     success: true,
                                     workitem: WorkItem
@@ -235,7 +235,7 @@ var WorkLogHandler = {
                     }
 
                     if (result) {
-                        WorkItem.itemid = result;
+                        WorkItem.workitemid = result;
                         res.json({
                             success: true,
                             workitem: WorkItem

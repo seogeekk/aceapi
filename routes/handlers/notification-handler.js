@@ -40,12 +40,13 @@ var NotificationHandler = {
             summary: req.body.summary
         };
 
+
         var username = req.body.username;
         var inspectionid = parseInt(req.body.inspectionid);
         var token = crypto.randomBytes(32).toString('hex');
         // set object token
         MailDetails.accepturl = 'http://localhost:8000/#!/workitem/' + token;
-
+        console.log(MailDetails);
         if (username && MailDetails.custname && MailDetails.address && MailDetails.claimid && MailDetails.summary && MailDetails.inspectiondate && inspectionid && token) {
             notification.getContactDetails(username, function(error, contact) {
                 if(error) {
@@ -69,7 +70,6 @@ var NotificationHandler = {
                                 return;
                             }
 
-                            console.log(MailDetails);
                             logger.info("Email request sent");
                             if (email) {
                                 logger.info("Determine if SMS is required");
@@ -77,7 +77,6 @@ var NotificationHandler = {
                                     logger.info("sendSMS("+MailDetails.tonumber+")");
                                     // build sms message
                                     var message = 'An inspection is requested on your property ' + MailDetails.address + '. Please respond if you are available on '+ MailDetails.inspectiondate + '. '+ MailDetails.accepturl;
-
 
                                     sms.sendSMS('+61' + MailDetails.tonumber, message, function(err, sms) {
                                         if (err) {
@@ -180,7 +179,7 @@ var NotificationHandler = {
         var username = req.body.username;
 
         MailDetails.accepturl = 'http://localhost:80/#!/request/manage/' + MailDetails.claimid;
-
+        console.log(MailDetails);
         if (username && MailDetails.custname && MailDetails.address && MailDetails.claimid && MailDetails.summary && MailDetails.status) {
             notification.getContactDetails(username, function(error, contact) {
                 if (error) {

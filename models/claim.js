@@ -8,6 +8,9 @@ var logger = require('../functions/logger');
 const CLAIMTYPE_GID = 3;
 const CLAIMSTATUS_GID = 4;
 
+var datetime = require('node-datetime');
+
+
 var ClaimDTO = {
     createNewClaim: function(claimObj, callback) {
 
@@ -208,6 +211,12 @@ var ClaimDTO = {
     },
     updateClaimStatus: function(claimid, status, callback) {
         return db.query("UPDATE claim SET status = ? WHERE claimid = ?", [status, claimid], callback);
+    },
+    approveClaim: function(claimid, username, callback) {
+        var now = datetime.create();
+        var auditdate = now.format("Y-m-d H:M:S");
+
+        return db.query("UPDATE claim SET approvaldate = ?, approveruser = ? WHERE claimid = ?", [auditdate, username, claimid], callback);
     }
 };
 

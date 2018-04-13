@@ -885,6 +885,7 @@ router.post(apiversion + 'notification/verifymail', notification.sendVerifyEmail
 // assign
 router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
+router.post(apiversion + 'claim/approve/', claim.approveClaim);
 
 router.post(apiversion + 'claim/status', claim.updateClaimStatus);
 

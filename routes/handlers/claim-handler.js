@@ -313,6 +313,38 @@ var ClaimHandler = {
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
+    },
+    approveClaim: function(req, res, next) {
+        var claimid = req.body.claimid;
+        var username = req.body.username;
+
+        console.log({claimid: claimid, username: username})
+        if(claimid && username) {
+            claim.approveClaim(claimid, username, function(error, results) {
+                logger.info("approveClaim[" + claimid + ", " + username + "]");
+
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.affectedRows == 1 || results.changedRows == 1) {
+                    res.json({
+                        success: true,
+                        claimid: claimid
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        claimid: claimid
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
     }
 };
 
