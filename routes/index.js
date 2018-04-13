@@ -12,6 +12,7 @@ var inspection = require('./handlers/inspection-handler');
 var smsapi = require('../functions/sms');
 var addressapi = require('../functions/address');
 var aceconfig = require('./handlers/aceconfig-handler');
+var notification = require('./handlers/notification-handler');
 
 
 /**
@@ -877,7 +878,9 @@ router.post(apiversion + 'inspection/new', inspection.createNewInspection);
  *               $ref: "#/definitions/inspection"
  *
  */
-router.post(apiversion + 'inspection/email', inspection.sendInspectionEmail);
+router.post(apiversion + 'notification/inspection', notification.sendInspectionEmail);
+router.post(apiversion + 'notification/claimstatus', notification.sendClaimStatusEmail);
+router.post(apiversion + 'notification/verifymail', notification.sendVerifyEmail);
 
 // assign
 router.post(apiversion + 'claim/assign/', claim.assignClaim);

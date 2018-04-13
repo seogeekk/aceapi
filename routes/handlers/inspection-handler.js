@@ -194,46 +194,6 @@ var InspectionHandler = {
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
-    },
-    sendInspectionEmail: function(req, res, next) {
-        var inspectionid = parseInt(req.body.inspectionid);
-
-        if(inspectionid) {
-            inspection.getInspectionSMSDetails(inspectionid, function(error, results) {
-                logger.info("sendInspectionEmail [" + inspectionid + "]");
-                if (error) {
-                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
-                    return;
-                }
-
-                if (results.length == 1) {
-                    var inspectionDetails = results[0];
-                    console.log(inspectionDetails);
-                    mailx.sendNewInspectionMail(inspectionDetails.emailaddress, inspectionDetails.customer, inspectionDetails.property, inspectionDetails.inspectiondate, inspectionDetails.claimid, inspectionDetails.summary, function(error, email) {
-                        if(error) {
-                            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR004', error.message, error.stack));
-                            return;
-                        } else {
-                            res.json ({
-                                success: true,
-                                message: email
-                            });
-                            return;
-                        }
-                    });
-
-
-                } else {
-                    res.json({
-                        success: false,
-                        message: null
-                    })
-                }
-            })
-
-        } else {
-            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
-        }
     }
 };
 

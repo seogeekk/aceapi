@@ -221,6 +221,7 @@ var ClaimHandler = {
         var claimid = parseInt(req.body.claimid);
         var auditwho = req.body.auditwho;
 
+        logger.info("assignClaim[" + username + ", " + claimid + "]", req.id);
         if(username && claimid && auditwho) {
             claim.assignClaim(username, claimid, auditwho, function(error, results) {
                 logger.info("assignClaim[" + username + ", " + claimid + "]");

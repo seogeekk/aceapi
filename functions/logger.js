@@ -4,7 +4,7 @@ var winstonLogger = new winston.Logger({
     transports: [
         new winston.transports.Console({
             level: 'debug',
-            handleExceptions: false,
+            handleExceptions: true,
             json: false,
             colorize: true,
             timestamp: true

@@ -45,10 +45,7 @@ function getToken() {
 }
 
 var SMSApi =  {
-    sendSMS: function(req, response, next) {
-        var tonumber = req.body.to;
-        var message = req.body.message;
-
+    sendSMS: function(tonumber, message, callback) {
 
         var smsdata = {
             to: tonumber,
@@ -74,18 +71,14 @@ var SMSApi =  {
                     json: true
                 })
                     .then(function(res){
-                        console.log(res);
-                        response.json({
-                            success: true
-                        });
-
+                        callback(null, res) ;
                     })
                     .catch(function(err) {
-                        response.status(err.statusCode).json(new errhandler(err.code, err.message));
+                        callback(err);
                     })
             })
             .catch(function(err) {
-                response.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR004', "Invalid/No Token"));
+                callback(err);
             });
     }
 };

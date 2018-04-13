@@ -45,7 +45,7 @@ function sendInspectionMail (MailDetails, callback) {
 
         var mailOptions = {
             from: aceemail,
-            to: recipient,
+            to: MailDetails.recipient,
             subject: 'Inspection Required',
             html: htmlToSend
         };
@@ -56,7 +56,6 @@ function sendInspectionMail (MailDetails, callback) {
             if(error) {
                 callback(error);
             }
-                        console.log(info);
             callback(null, info);
         });
     });
@@ -73,14 +72,15 @@ function sendStatusMail (MailDetails, callback) {
             property: MailDetails.address,
             claimid: MailDetails.claimid,
             summary: MailDetails.summary,
-            accepturl : MailDetails.accepturl
+            status: MailDetails.status,
+            accepturl: MailDetails.accepturl
         }
 
         var htmlToSend = template(replacements);
 
         var mailOptions = {
             from: aceemail,
-            to: recipient,
+            to: MailDetails.recipient,
             subject: 'Request ' + MailDetails.claimid + ' - Status Update',
             html: htmlToSend
         };
@@ -91,7 +91,6 @@ function sendStatusMail (MailDetails, callback) {
             if(error) {
                 callback(error);
             }
-            console.log(info);
             callback(null, info);
         });
     });
@@ -112,7 +111,7 @@ function sendMailVerification (MailDetails, callback) {
 
         var mailOptions = {
             from: aceemail,
-            to: recipient,
+            to: MailDetails.recipient,
             subject: 'Ace Body Online - Verify Email',
             html: htmlToSend
         };
@@ -123,7 +122,6 @@ function sendMailVerification (MailDetails, callback) {
             if(error) {
                 callback(error);
             }
-            console.log(info);
             callback(null, info);
         });
     });
@@ -131,4 +129,4 @@ function sendMailVerification (MailDetails, callback) {
 }
 
 
-module.exports = { sendInspectionMail, sendStatusMail };
+module.exports = { sendInspectionMail, sendStatusMail, sendMailVerification };

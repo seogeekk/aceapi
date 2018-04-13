@@ -171,9 +171,10 @@ var ClaimDTO = {
             "WHERE a.claimid = ? ORDER BY a.auditwhen DESC LIMIT 1", [claimid], callback);
     },
     assignClaim: function(username, claimid, auditwho, callback) {
-
+        logger.info("query: assignClaim()");
         return db.query("SELECT username FROM assignhistory WHERE claimid = ? ORDER BY auditwhen DESC LIMIT 1", [claimid], function(error, results) {
             if(error) {
+                logger.error("query: assignClaim() - select");
                 callback(error);
             }
             if (results.length == 1) {
@@ -181,10 +182,27 @@ var ClaimDTO = {
                 if (username == lastuser) {
                     // we shouldn't assign any
                     callback(null, results);
+                } else {
+                    logger.info("query: assignClaim() - insert");
+                    db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
+                        "VALUES(?, ?, ?)", [claimid, username, auditwho], function(error, assign) {
+                        if (error) {
+                            callback(error);
+                        } else {
+                            callback(null, assign);
+                        }
+                    });
                 }
             }else {
-                return db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
-                    "VALUES(?, ?, ?)", [claimid, username, auditwho], callback);
+                logger.info("query: assignClaim() - insert");
+                db.query("INSERT INTO assignhistory (claimid, username, auditwho) " +
+                    "VALUES(?, ?, ?)", [claimid, username, auditwho], function(error, assign) {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        callback(null, assign);
+                    }
+                });
             }
         })
     },
