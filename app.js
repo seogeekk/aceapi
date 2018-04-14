@@ -60,21 +60,6 @@ var options = {
 // Initialize swagger-jsdoc -> returns validated swagger spec in json format
 var swaggerSpec = swaggerJSDoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// swaggerUi.runner.config.swagger.securityHandlers = {
-//     apikey1: function (req, authOrSecDef, scopesOrApiKey, callback) {
-//         // ...
-//     }
-// }
-//
-// // install middleware
-// swaggerUi.register(app);
-
-// Run the context for each request. Assign a unique identifier to each request
-/*
-app.use(function(req, res, next) {
-
-});
-*/
 
 // Auth Middleware
 app.all('/api/*', [require('./middlewares/validateRequest')]);
