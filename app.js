@@ -7,8 +7,6 @@ var bodyParser = require('body-parser');
 var fileUpload = require('express-fileupload');
 var cors = require('cors');
 
-
-
 // routes
 var index = require('./routes/index');
 
@@ -40,26 +38,22 @@ app.use(logger(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:htt
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(fileUpload());
 
-// Swagger
-var swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+// Swagger UI
+var auth = require('http-auth');
 
-var options = {
-    swaggerDefinition: {
-        info: {
-            title: 'Ace API', // Title (required)
-            version: '1.0.0', // Version (required)
-        },
-    },
-    apis: ['./routes/index.js'], // Path to the API docs
-};
-
-// Initialize swagger-jsdoc -> returns validated swagger spec in json format
-var swaggerSpec = swaggerJSDoc(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Basic authentication
+var basic = auth.basic({
+        realm: "swagger-ui",
+    }, function (username, password, callback) {
+        callback(username === "sweg" && password === "swaggeryou");
+    }
+);
+var authMiddleware = auth.connect(basic);
+app.use( "/api-docs", [ authMiddleware, express.static(path.join(__dirname, 'api-docs')) ] );
+app.use('/', require('./middlewares/swagger'));
 
 // Auth Middleware
 app.all('/api/*', [require('./middlewares/validateRequest')]);
