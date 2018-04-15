@@ -407,6 +407,12 @@ var WorkLogDTO = {
             "inspectionrespdate, inspectiondate, inspectionwho, inspectionwhen " +
             "FROM workitemdetails " +
             "WHERE workitemid = ?", [workitemid], callback);
+    },
+    getAttachment: function(itemid, callback) {
+        logger.info("query: getAttachmentClaimid[" + itemid + "]");
+        db.query("SELECT w.worklogid as claimid, a.attachment " +
+            "FROM worklogattachrel wa, workloghistory w, attachment a " +
+            "WHERE wa.itemid = ? AND wa.workitemid = w.workitemid AND a.itemid = wa.itemid", [itemid], callback);
     }
 };
 

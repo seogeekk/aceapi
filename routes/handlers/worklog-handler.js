@@ -10,6 +10,7 @@ var restobj = require('../../objects/rest-object');
 var fs = require('fs');
 var datetime = require('node-datetime');
 var path = require('path');
+var mime = require('mime');
 
 // Objects
 
@@ -468,6 +469,42 @@ var WorkLogHandler = {
                     })
                 }
             });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+
+    },
+    downloadAttachment: function(req, res, next) {
+
+        var itemid = parseInt(req.params.itemid);
+
+        if (itemid) {
+            worklog.getAttachment(itemid, function(error, results) {
+                if (error) {
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+                if (results.length == 1) {
+
+                    console.log(results);
+                    var claimid = results[0].claimid;
+                    var filename = results[0].attachment;
+
+                    // grab the file from uploadRootDirectory
+                    var file = uploadRootDir + claimid + '/' + filename;
+                    var mimetype = mime.getType(file);
+
+                    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+                    res.setHeader('Content-type', mimetype);
+
+                    var filestream = fs.createReadStream(file);
+                    filestream.pipe(res);
+                } else {
+                    res.json({
+                        success: false
+                    })
+                }
+            })
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }

@@ -887,6 +887,9 @@ router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
 router.post(apiversion + 'claim/approve/', claim.approveClaim);
 
+// attachment
+router.get(apiversion + 'attachment/download/:itemid', worklog.downloadAttachment);
+
 router.post(apiversion + 'claim/status', claim.updateClaimStatus);
 
 router.post(apiversion + 'sms/notify', smsapi.sendSMS);
