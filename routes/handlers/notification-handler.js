@@ -132,7 +132,7 @@ var NotificationHandler = {
         var inspectionid = parseInt(req.body.inspectionid);
         var token = crypto.randomBytes(32).toString('hex');
         // set object token
-        MailDetails.accepturl = 'http://localhost:80/#!/verify/' + token;
+        MailDetails.accepturl = 'http://localhost:8000/#!/verify/' + token;
 
         if (MailDetails.custname && MailDetails.accepturl && username) {
             notification.getContactDetails(username, function(error, contact) {
@@ -178,7 +178,7 @@ var NotificationHandler = {
 
         var username = req.body.username;
 
-        MailDetails.accepturl = 'http://localhost:80/#!/request/manage/' + MailDetails.claimid;
+        MailDetails.accepturl = 'http://localhost:8000/#!/request/manage/' + MailDetails.claimid;
         console.log(MailDetails);
         if (username && MailDetails.custname && MailDetails.address && MailDetails.claimid && MailDetails.summary && MailDetails.status) {
             notification.getContactDetails(username, function(error, contact) {
