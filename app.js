@@ -56,6 +56,7 @@ app.use( "/api-docs", [ authMiddleware, express.static(path.join(__dirname, 'api
 app.use('/', require('./middlewares/swagger'));
 
 // Auth Middleware
+app.all('/inspection-view/*', [require('./middlewares/validateToken')]);
 app.all('/api/*', [require('./middlewares/validateRequest')]);
 
 app.use('/', require('./routes/index'));

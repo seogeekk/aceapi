@@ -100,19 +100,15 @@ var InspectionHandler = {
         }
     },
     updateInspectionStatus: function(req, res, next) {
-        // create new instance of propertyObj
-        var Inspection = new inspectionObj();
 
+        var payload = {};
         // Define parameters json body
-        Inspection.inspectionid = parseInt(req.body.workitemid);
-        Inspection.response = parseInt(req.body.reponse);
-        Inspection.responsedate = datetime.create(req.body.responsedate).format("Y-m-d H:M:S");
-        Inspection.auditwho = req.body.username;
+        payload.inspectionid = parseInt(req.body.inspectionid);
+        payload.response = parseInt(req.body.response);
 
-        console.log(Inspection);
-        // TODO: Add validations to json body
-        if(Inspection.workitemid && Inspection.response && Inspection.responsedate && Inspection.auditwho) {
-            inspection.updateInspectionStatus(Inspection.workitemid, Inspection.response, Inspection.responsedate, Inspection.auditwho, function(error, results) {
+        console.log(payload);
+        if(payload.inspectionid && (payload.response == 0 || payload.response == 1)) {
+            inspection.updateInspectionStatus(payload.inspectionid, payload.response, function(error, results) {
                 if (error) {
                     // Handle basic error
                     res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
@@ -121,12 +117,12 @@ var InspectionHandler = {
                 if (results.changedRows == 1 || results.affectedRows == 1) {
                     res.json({
                         success: true,
-                        inspection: Inspection
+                        response: payload
                     });
                 } else {
                     res.json({
                         success: false,
-                        inspection: null
+                        response: null
                     })
                 }
             })
@@ -183,6 +179,33 @@ var InspectionHandler = {
                     res.json({
                         success: true,
                         inspection: inspectionDetails
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        inspection: null
+                    })
+                }
+            })
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getInspectionDetailsByToken: function(req, res, next) {
+        var token = req.params.token;
+
+        if(token) {
+            inspection.getInspectionDetailsByToken(token, function(error, results) {
+                logger.info("getInspectionDetailsByToken [" + token + "]");
+                if (error) {
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if (results.length == 1) {
+                    res.json({
+                        success: true,
+                        inspection: results[0]
                     });
                 } else {
                     res.json({

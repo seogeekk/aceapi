@@ -41,19 +41,15 @@ var InspectionDTO = {
                     inspectionObj.inspectionid
                 ], callback);
     },
-    updateInspectionStatus: function(inspectionid, response, responsedate, auditwho, callback) {
+    updateInspectionStatus: function(inspectionid, response, callback) {
         logger.info("query: updateInspectionStatus[" + inspectionid + "]");
         var now = datetime.create();
         var auditdate = now.format("Y-m-d H:M:S");
         db.query("UPDATE inspection " +
                 "SET response = ?," +
-                    "responsedate = ?," +
-                    "auditwho = ?," +
-                    "auditwhen = ? " +
+                    "responsedate = ? " +
                     "WHERE inspectionid = ?", [
                         response,
-                        responsedate,
-                        auditwho,
                         auditdate,
                         inspectionid
                     ], callback);
@@ -68,9 +64,14 @@ var InspectionDTO = {
         db.query("SELECT workitemid, description, response as responseid, ac12.longdesc as responsename, submitteddate, responsedate, inspectiondate, auditwho, auditwhen " +
             "FROM inspection i JOIN aceconfig ac12 ON ac12.ordinal = i.response AND ac12.groupid = ? WHERE inspectionid = ?", [RESPONSETYPE_GID, inspectionid], callback);
     },
-    getInspectionSMSDetails: function(inspectionid, callback) {
-        logger.info("query: getInspectionSMSDetails["+inspectionid+"]");
-        db.query("SELECT customer, emailaddress, property, inspectiondate, claimid, summary FROM inspectiondetails WHERE inspectionid = ?", [inspectionid], callback);
+    getInspectionDetailsByToken: function(token, callback) {
+        logger.info("query: getInspectionDetailsByToken["+token+"]");
+        db.query("SELECT inspectionid, valid, response, responsedate, inspectiondate, claimid, description, address1, address2, suburb, state, postcode, latitude, longitude " +
+            "FROM inspectiondetails WHERE token = ?", [token], callback);
+    },
+    validateToken: function(token, callback) {
+        logger.info("query: validateToken["+token+"]");
+        db.query("SELECT inspectionid FROM inspection WHERE token = ?", [token], callback);
     }
 };
 

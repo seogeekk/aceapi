@@ -2,6 +2,7 @@
 var constants = require('../functions/constants');
 var errhandler = require('../objects/apperror-object');
 var user = require('../models/user');
+var validateToken = require('../models/inspection').validateToken;
 var jwt = require('jwt-simple');
 var encrypt = require('../functions/crypto').encrypt;
 var decrypt = require('../functions/crypto').decrypt;
@@ -51,6 +52,9 @@ var auth = {
             }
             callback(undefined);
         });
+    },
+    validateToken: function(token, callback) {
+        validateToken(token, callback);
     }
 }
 

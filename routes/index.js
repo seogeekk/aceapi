@@ -846,6 +846,7 @@ router.get(apiversion + 'worklog/workitems/:worklogid', worklog.getAllWorkItemLo
  *
  */
 router.post(apiversion + 'inspection/new', inspection.createNewInspection);
+
 /**
  * @swagger
  * /api/v1/inspection/email:
@@ -900,5 +901,7 @@ router.get(apiversion + 'address/complete', addressapi.completeAddress);
 router.get(apiversion + 'config/:groupid', aceconfig.getGroupid);
 router.get(apiversion + 'config/:groupid/:ordinal', aceconfig.getOrdinal);
 
+router.get('/inspection-view/:token', inspection.getInspectionDetailsByToken);
+router.post('/inspection-view/', inspection.updateInspectionStatus);
 
 module.exports = router;
