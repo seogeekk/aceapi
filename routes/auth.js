@@ -31,6 +31,9 @@ var auth = {
             } else if(!dbUserObj) {
                 res.status(constants.UNAUTHORIZED);
                 res.json(new errhandler('ERR401'));
+            } else if (dbUserObj.status != 2) {
+                res.status(constants.UNAUTHORIZED);
+                res.json(new errhandler('ERR004'));
             } else {
                 res.json(genToken(dbUserObj));
             }

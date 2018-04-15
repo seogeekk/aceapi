@@ -44,6 +44,12 @@ module.exports = function(req, res, next) {
                         }
                     });
 
+                    if (dbUser.status != 2) {
+                        res.status(constants.FORBIDDEN);
+                        res.json(new errhandler("403", "Not Authorized"));
+                        return;
+                    }
+
                     // Restrict admin urls
                     if((dbUser.roleid == 1) && req.url.indexOf('admin') >= 0) {
                         next();
