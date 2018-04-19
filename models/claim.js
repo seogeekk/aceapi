@@ -66,6 +66,7 @@ var ClaimDTO = {
         logger.info("query: getAllClaims["+limit+","+offset+"]");
         db.query("SELECT claimid," +
                         "property_canonical_id," +
+                        "propertyid," +
                         "address1," +
                         "address2," +
                         "suburb," +

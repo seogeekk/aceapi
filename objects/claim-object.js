@@ -52,6 +52,7 @@ function ClaimDetail(Claim) {
     this.claimid = Claim.claimid;
     this.property = {
         name: Claim.propertyname,
+        propertyid: Claim.propertyid,
         property_canonical_id: Claim.property_canonical_id,
         address1: Claim.address1,
         address2: Claim.address2,
