@@ -30,6 +30,93 @@ function parseError(error) {
 
 var NotificationHandler = {
 
+    getUserDashboard: function(req, res, next) {
+        var username = req.params.username;
+
+        if(username) {
+            notification.getUserDashboard(username, function(error, results) {
+                logger.info("getUserDashboard[" + username + "]");
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length == 1) {
+                    res.json({
+                        success: true,
+                        dashboard: results[0]
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        dashboard: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getStaffDashboard: function(req, res, next) {
+        var username = req.params.username;
+
+        if(username) {
+            notification.getStaffDashboard(username, function(error, results) {
+                logger.info("getStaffDashboard[" + username + "]");
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length == 1) {
+                    res.json({
+                        success: true,
+                        dashboard: results[0]
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        dashboard: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getStaffCalendar: function(req, res, next) {
+        var username = req.params.username;
+
+        if(username) {
+            notification.getStaffCalendar(username, function(error, results) {
+                logger.info("getStaffCalendar[" + username + "]");
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 1) {
+                    res.json({
+                        success: true,
+                        calendar: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        calendar: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
     sendInspectionEmail: function (req, res, next) {
         // generate token
         var MailDetails = {

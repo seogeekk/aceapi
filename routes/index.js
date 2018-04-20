@@ -183,10 +183,11 @@ router.post(apiversion + 'user/changestatus', user.changeUserStatus);
 
 // Customer
 router.post(apiversion + 'customer/new', customer.createNewCustomer);
+router.get(apiversion + 'customer/search/', customer.searchCustomer);
 router.get(apiversion + 'customer/:username', customer.getCustomerDetails);
 router.get(apiversion + 'customer/', customer.getAllCustomers);
 router.post(apiversion + 'customer/update', customer.updateCustomerDetails);
-router.post(apiversion + 'customer/newclass', customer.createNewCustClass);
+
 
 // Staff
 /**
@@ -256,7 +257,7 @@ router.post(apiversion + 'staff/update', staff.updateStaffDetails);
  */
 router.get(apiversion + 'staff/', staff.getAllStaff);
 
-router.get(apiversion + 'staff/search/', staff.searchStaff);
+router.get(apiversion + 'staff/search', staff.searchStaff);
 /**
  * @swagger
  * /api/v1/staff/{username}:
@@ -883,9 +884,15 @@ router.post(apiversion + 'notification/inspection', notification.sendInspectionE
 router.post(apiversion + 'notification/claimstatus', notification.sendClaimStatusEmail);
 router.post(apiversion + 'notification/verifymail', notification.sendVerifyEmail);
 
+// dashboard
+router.get(apiversion + 'dashboard/user/:username', notification.getUserDashboard);
+router.get(apiversion + 'dashboard/staff/:username', notification.getStaffDashboard);
+router.get(apiversion + 'dashboard/calendar/:username', notification.getStaffCalendar);
+
 // assign
 router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
+router.get(apiversion + 'claim/assign/all/:username', claim.getAssignedByUser);
 router.post(apiversion + 'claim/approve/', claim.approveClaim);
 
 // attachment

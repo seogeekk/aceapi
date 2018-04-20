@@ -15,6 +15,18 @@ var custClassObj = require('../../objects/customer-object').CustClass;
 // Logger
 var logger = require('../../functions/logger');
 
+function parseError(error) {
+    switch (error.code) {
+        case 'ER_NO_REFERENCED_ROW_2':
+            logger.error(error.code + ": " + error.message);
+            return new errhandler(error.code, "Username doesn't exists");
+        default:
+            logger.error(error.code + ": " + error.message);
+            return new errhandler(error.code, error.message, error.stack)
+    }
+    return null;
+}
+
 var CustHandler = {
 
     createNewCustomer: function(req, res, next) {
@@ -193,8 +205,36 @@ var CustHandler = {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
     },
-    updateCustClassDetails: function(req, res, next) {
+    searchCustomer: function(req, res, next) {
+        var query = req.query.query;
 
+        logger.debug(query, req.id);
+        customer.searchCustomer(query, function(error, results) {
+            if (error) {
+                // Handle basic error
+                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                return;
+            }
+
+            logger.info("searchCustomer() ret: " + results.length, req.id);
+            var rows = [];
+            for (var i = 0; i < results.length; i++) {
+                rows.push(new custDetObj(results[i]));
+            }
+
+            if(results.length > 0) {
+                res.json({
+                    success: true,
+                    customer: rows
+                });
+
+            } else {
+                res.json({
+                    success: false,
+                    customer: null
+                })
+            }
+        });
     }
 }
 

@@ -1,6 +1,7 @@
 
 
 var claimid,
+    property_canonical_id,
     propertyid,
     propertyname,
     address1,
@@ -21,13 +22,9 @@ var claimid,
     submitteduser,
     status,
     statusname,
-    reviewstartdate,
-    reviewenddate,
     approvaldate,
-    authoriseddate,
     approveruser,
-    processeddate,
-    property_canonical_id;
+    auditwho;
 
 module.exports = { Claim, ClaimDetail };
 
@@ -40,18 +37,14 @@ function Claim() {
     this.submitteddate = submitteddate;
     this.submitteduser = submitteduser;
     this.status = status;
-    this.reviewstartdate = reviewstartdate;
-    this.reviewenddate = reviewenddate;
     this.approvaldate = approvaldate;
-    this.authoriseddate = authoriseddate;
     this.approveruser = approveruser;
-    this.processeddate = processeddate;
+    this.auditwho = auditwho;
 }
 
 function ClaimDetail(Claim) {
     this.claimid = Claim.claimid;
     this.property = {
-        name: Claim.propertyname,
         propertyid: Claim.propertyid,
         property_canonical_id: Claim.property_canonical_id,
         address1: Claim.address1,
@@ -76,14 +69,13 @@ function ClaimDetail(Claim) {
     this.submitteddate = Claim.submitteddate;
     this.submitteduser = Claim.submitteduser;
     this.submittedname = Claim.submittedname;
+    this.assignusername = Claim.assignusername;
+    this.assignname = Claim.assignname;
     this.status = {
         statusid: Claim.status,
         statusname: Claim.statusname
     }
-    this.reviewstartdate = Claim.reviewstartdate;
-    this.reviewenddate = Claim.reviewenddate;
     this.approvaldate = Claim.approvaldate;
-    this.authoriseddate = Claim.authoriseddate;
     this.approveruser = Claim.approveruser;
-    this.processeddate = Claim.processeddate;
+    this.auditwho = Claim.auditwho;
 }

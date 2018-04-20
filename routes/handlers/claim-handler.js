@@ -39,10 +39,12 @@ var ClaimHandler = {
         Claim.summary = req.body.summary;
         Claim.description = req.body.description;
         Claim.submitteduser = req.body.submitteduser;
+        Claim.auditwho = req.body.auditwho;
         Claim.status = CLAIM_OPEN_STATUS;
 
+        console.log(Claim);
         // TODO: Add validations to json body
-        if(Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser) {
+        if(Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser && Claim.auditwho) {
             claim.createNewClaim(Claim, function(error, results) {
                 if (error) {
                     // Handle basic error
@@ -77,18 +79,13 @@ var ClaimHandler = {
         Claim.summary = req.body.summary;
         Claim.description = req.body.description;
         Claim.submitteduser = req.body.submitteduser;
-        Claim.status = parseInt(req.body.status);
-        Claim.reviewstartdate = Date.parse(req.body.reviewstartdate) || undefined;
-        Claim.reviewenddate = Date.parse(req.body.reviewenddate) || undefined;
         Claim.approvaldate = Date.parse(req.body.approvaldate) || undefined;
-        Claim.authoriseddate = Date.parse(req.body.authoriseddate) || undefined;
         Claim.approveruser = req.body.approveruser || undefined;
-        Claim.processeddate = Date.parse(req.body.processeddate) || undefined;
+        Claim.auditwho = req.body.auditwho;
 
         console.log(Claim);
-        Claim.status = 1;
         // TODO: Add validations to json body
-        if(Claim.claimid && Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser && Claim.status) {
+        if(Claim.claimid && Claim.property_canonical_id && Claim.claimtypeid && Claim.summary && Claim.submitteduser && Claim.auditwho) {
             logger.info("updateClaimDetails["+Claim.claimid+"]");
             claim.updateClaimDetails(Claim, function(error, results) {
                 if (error) {
@@ -242,6 +239,36 @@ var ClaimHandler = {
                     res.json({
                         success: false,
                         username: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getAssignedByUser: function(req, res, next) {
+        var username = req.params.username;
+
+        if(username) {
+            claim.getAssignedByUser(username, function(error, results) {
+                logger.info("getAssignedByUser[" + username + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        assign: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        assign: null
                     })
                 }
             });

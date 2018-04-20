@@ -53,6 +53,13 @@ var customerDTO = {
              custObj.state, custObj.postcode, custObj.country, custObj.username], callback);
 
         // TODO: Insert to customerhistory - Any customer details changes
+    },
+    searchCustomer: function(query, callback) {
+        logger.info("query: searchCustomer["+query+"]");
+        db.query("SELECT c.customerid, c.customertypeid as custtypeid, a.longdesc as custtype, c.username, c.customername, c.address1, c.address2, c.suburb, c.state, c.postcode, c.country FROM customer c " +
+            " LEFT JOIN aceconfig a ON a.ordinal = c.customertypeid AND a.groupid = ? " +
+            " WHERE c.customername LIKE ? OR c.username LIKE ? ",
+            [CUSTTYPE_GID, '%'+query+'%', '%'+query+'%'], callback);
     }
 }
 
