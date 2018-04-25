@@ -10,7 +10,7 @@ const sms_access_key = 'j0zC2hSwJ74jtrfIQ27wMTMkU9sMvu1i',
       sms_secret_key = '7J6dzeelEQonZGvF';
 
 var smsdomain = 'https://tapi.telstra.com';
-var provision = '+61472880424';
+var provision = '+61472880423';
 
 var callbackURL = '';
 var replyflag = 'false';
