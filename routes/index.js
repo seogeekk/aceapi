@@ -178,7 +178,7 @@ router.post(apiversion + 'user/update', user.updateUser);
  */
 router.get(apiversion + 'user/:username', user.getUserDetails);
 router.get(apiversion + 'user/', user.getAllUsers);
-router.get(apiversion + 'user/getrole/:username', user.getUserRole);
+router.get(apiversion + 'user/getstatus/:username', user.getUserStatus);
 router.post(apiversion + 'user/changestatus', user.changeUserStatus);
 
 // Customer

@@ -16,8 +16,8 @@ var UserDTO = {
     getAllUsers: function(callback) {
         return db.query("SELECT userid, username, firstname, lastname, roleid, status FROM user", callback);
     },
-    getUserRole: function (username, callback) {
-        return db.query("SELECT u.roleid, a.shortdesc FROM user u, aceconfig a WHERE a.groupid = 2 AND a.ordinal = u.roleid AND u.username = ?", [username], callback);
+    getUserStatus: function (username, callback) {
+        return db.query("SELECT u.status, a.shortdesc statusname FROM user u, aceconfig a WHERE a.groupid = 2 AND a.ordinal = u.status AND u.username = ?", [username], callback);
     },
     createUser: function (User, callback) {
         // default account status to Open

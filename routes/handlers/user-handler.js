@@ -79,16 +79,19 @@ var UserHandler = {
         });
     },
 
-    getUserRole: function (req, res, next) {
+    getUserStatus: function (req, res, next) {
         if (req.params.username) {
-            user.getUserRole(req.params.username, function (err, result) {
+            user.getUserStatus(req.params.username, function (err, result) {
                 if (err) {
                     var error = new errhandler(err.status, err.message, err.stack);
                     res.status(constants.SERVER_ERROR_CODE).json(error);
                 } else {
                     // return rows
                     if (result.length == 1) {
-                        res.json(result);
+                        res.json({
+                            success: true,
+                            user: result[0]
+                        });
                     } else {
                         var error = new errhandler('ERR001')
                         res.status(constants.NO_RESULTS).json(error);
@@ -202,11 +205,15 @@ var UserHandler = {
                     } else {
                         // return rows
                         if (result.affectedRows == 1) {
-                            var payload = new restobj("SUCCESS", "User Status updated");
-                            res.json(payload);
+                            res.json({
+                                success: true,
+                                message: "Status updated"
+                            });
                         } else {
-                            var error = new errhandler('ERR001')
-                            res.status(constants.NOT_FOUND_CODE).json(error);
+                            res.json({
+                                success: false,
+                                message: "Status update failed"
+                            });
                         }
                     }
                 });
@@ -224,40 +231,45 @@ var UserHandler = {
         var username = req.body.username;
         var password = req.body.password;
 
-        // TODO: implement validation on password
-        user.validateUsername(username, function(error, result) {
-            if (error) {
-                // Handle basic error
-                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
-                return;
-            }
-            if (result.username === username) {
-                // change password
-                user.changePassword(username, password, function(error, result) {
-                    if (error) {
-                        // Handle basic error
-                        res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
-                        return;
-                    }
-                    if (result.changedRows === 1 || result.affectedRows === 1) {
-                        res.json({
-                            username: username,
-                            success: true,
-                            message: "Password changed"
-                        });
-                    } else {
-                        res.json({
-                            username: username,
-                            success: false,
-                            message: "Password change failed"
-                        })
-                    }
-                })
-            } else {
-                error = new errhandler("ERR404", "Username NOT FOUND");
-                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
-            }
-        })
+        if (username && password) {
+            // TODO: implement validation on password
+            user.validateUsername(username, function(error, result) {
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+                if (result.username === username) {
+                    // change password
+                    user.changePassword(username, password, function(error, result) {
+                        if (error) {
+                            // Handle basic error
+                            res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                            return;
+                        }
+                        if (result.changedRows === 1 || result.affectedRows === 1) {
+                            res.json({
+                                username: username,
+                                success: true,
+                                message: "Password changed"
+                            });
+                        } else {
+                            res.json({
+                                username: username,
+                                success: false,
+                                message: "Password change failed"
+                            })
+                        }
+                    })
+                } else {
+                    error = new errhandler("ERR404", "Username NOT FOUND");
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                }
+            })
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+
     }
 
 }
