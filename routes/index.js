@@ -889,6 +889,15 @@ router.get(apiversion + 'dashboard/user/:username', notification.getUserDashboar
 router.get(apiversion + 'dashboard/staff/:username', notification.getStaffDashboard);
 router.get(apiversion + 'dashboard/calendar/:username', notification.getStaffCalendar);
 
+// stats
+router.get(apiversion + 'stats/suburb/:reportdate', claim.getSuburbStat);
+router.get(apiversion + 'stats/completion/:reportdate', claim.getCompletionStat);
+router.get(apiversion + 'stats/requesttype/:reportdate', claim.getRequestTypeStat);
+router.get(apiversion + 'stats/requestcount/:reportdate', claim.getRequestCountStat);
+router.get(apiversion + 'stats/requestduration/:reportdate', claim.getRequestDurationStat);
+router.get(apiversion + 'stats/staff/:reportdate', staff.getStaffStat);
+router.get(apiversion + 'stats/customer/:reportdate', customer.getCustomerStat);
+
 // assign
 router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);

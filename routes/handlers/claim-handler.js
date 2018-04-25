@@ -372,6 +372,161 @@ var ClaimHandler = {
         } else {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
+    },
+    getSuburbStat: function(req, res, next) {
+        var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+        console.log(querydate);
+        if(querydate) {
+            claim.getSuburbStat(querydate, function(error, results) {
+                logger.info("getSuburbStat[" + querydate + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        stats: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        stats: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getCompletionStat: function(req, res, next) {
+        var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+        console.log(querydate);
+        if(querydate) {
+            claim.getCompletionStat(querydate, function(error, results) {
+                logger.info("getCompletionStat[" + querydate + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        stats: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        stats: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getRequestTypeStat: function(req, res, next) {
+        var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+        console.log(querydate);
+        if(querydate) {
+            claim.getRequestTypeStat(querydate, function(error, results) {
+                logger.info("getRequestTypeStat[" + querydate + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        stats: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        stats: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getRequestCountStat: function(req, res, next) {
+        var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+        console.log(querydate);
+        if(querydate) {
+            claim.getRequestCountStat(querydate, function(error, results) {
+                logger.info("getRequestCountStat[" + querydate + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        stats: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        stats: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getRequestDurationStat: function(req, res, next) {
+        var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+        console.log(querydate);
+        if(querydate) {
+            claim.getRequestDurationStat(querydate, function(error, results) {
+                logger.info("getRequestDurationStat[" + querydate + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        stats: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        stats: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
     }
 };
 

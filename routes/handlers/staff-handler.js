@@ -195,7 +195,38 @@ var StaffHandler = {
                 })
             }
         });
+    },
+    getStaffStat: function(req, res, next) {
+    var querydate = Date.parse(req.params.reportdate) || Date.now();
+
+    console.log(querydate);
+    if(querydate) {
+        staff.getStaffStat(querydate, function(error, results) {
+            logger.info("getStaffStat[" + querydate + "]");
+            console.log(results);
+            if (error) {
+                // Handle basic error
+                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                return;
+            }
+
+            if(results.length > 0) {
+                res.json({
+                    success: true,
+                    stats: results
+                });
+
+            } else {
+                res.json({
+                    success: false,
+                    stats: null
+                })
+            }
+        });
+    } else {
+        res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
     }
+}
 };
 
 module.exports = StaffHandler;

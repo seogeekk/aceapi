@@ -205,6 +205,56 @@ var ClaimDTO = {
 
         logger.info("query: approveClaim("+claimid+")");
         db.query("UPDATE claim SET approvaldate = ?, approveruser = ? WHERE claimid = ?", [auditdate, username, claimid], callback);
+    },
+    getSuburbStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getSuburbStat("+querydate+")");
+        db.query("SELECT suburb, allrequest, openrequest " +
+                "FROM suburbstat " +
+            "WHERE year = year(?)", [querydate], callback);
+    },
+    getCompletionStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getCompletionStat("+querydate+")");
+        db.query("SELECT IFNULL(allrequests,0) allrequests, ROUND(IFNULL(avgcompleted,0),0) avgcompleted, ROUND(IFNULL(pcntcompleted,0),2) pcntcompleted, ROUND(IFNULL(avgduration,0),0) avgduration " +
+            "FROM requestcompletionstat " +
+            "WHERE year = year(?)", [querydate], callback);
+    },
+    getRequestTypeStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getCompletionStat("+querydate+")");
+        db.query("SELECT ac.shortdesc requesttype, count(c.claimid) count " +
+                "FROM aceconfig ac " +
+                "LEFT JOIN claimdetails c ON c.claimtypeid = ac.ordinal " +
+                "AND year(c.submitteddate) = year(?) " +
+                "WHERE ac.groupid = 3 " +
+            "GROUP BY ac.shortdesc", [querydate], callback);
+    },
+    getRequestCountStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getRequestCountStat("+querydate+")");
+        db.query("SELECT allrequests, closedrequests, rejectedrequests, cancelledrequests, closed1d, closed1w, closedgt1w " +
+            "FROM requestcountstat " +
+            "WHERE year = year(?)", [querydate], callback);
+    },
+    getRequestDurationStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getRequestDurationStat("+querydate+")");
+        db.query("SELECT c.claimid, ac.longdesc status, c.startdate, c.enddate, c.duration " +
+            "FROM claimdurationstat c " +
+            "JOIN aceconfig ac ON ac.ordinal = c.status " +
+            "AND ac.groupid = 4 " +
+            "WHERE c.year = year(?) AND c.month = month(?)", [querydate, querydate], callback);
     }
 };
 

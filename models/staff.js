@@ -5,6 +5,8 @@
 var db = require('../functions/dbconnect');
 var logger = require('../functions/logger');
 
+var datetime = require('node-datetime');
+
 const STAFFDEPT_GID = 7;
 const STAFFACCESS_GID = 8;
 
@@ -39,6 +41,15 @@ var StaffDTO = {
             "LEFT JOIN aceconfig ac2 ON ac2.ordinal = s.accesstype AND ac2.groupid = ? " +
             "JOIN user u ON u.username = s.username " +
             "WHERE s.username LIKE ? OR s.staffname LIKE ? LIMIT 10", [STAFFDEPT_GID, STAFFACCESS_GID, '%'+query+'%', '%'+query+'%'], callback);
+    },
+    getStaffStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getStaffStat("+querydate+")");
+        db.query("SELECT s.username, s.staffname, ifnull(ss.assigned,0) assigned, ifnull(ss.openassigned,0) openassigned, ifnull(ss.forapproval,0) forapproval, ifnull(ss.completed,0) completed, ifnull(ss.throughput,0) throughput " +
+            "FROM staff s " +
+            "LEFT JOIN staffstat ss ON s.username = ss.username AND ss.year = year(?) AND ss.month = month(?)", [querydate, querydate], callback);
     }
 };
 

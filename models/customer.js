@@ -5,6 +5,8 @@
 var db = require('../functions/dbconnect');
 var logger = require('../functions/logger');
 
+var datetime = require('node-datetime');
+
 const CUSTTYPE_GID = 6;
 
 var customerDTO = {
@@ -60,6 +62,16 @@ var customerDTO = {
             " LEFT JOIN aceconfig a ON a.ordinal = c.customertypeid AND a.groupid = ? " +
             " WHERE c.customername LIKE ? OR c.username LIKE ? ",
             [CUSTTYPE_GID, '%'+query+'%', '%'+query+'%'], callback);
+    },
+    getCustomerStat: function(reportdate, callback) {
+        var now = datetime.create(reportdate);
+        var querydate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getCustomerStat("+querydate+")");
+        db.query("SELECT c.username, c.customername, ac.longdesc customertype, IFNULL(cs.requests,0) requests, IFNULL(cs.openrequests,0) openrequests, IFNULL(cs.completedrequests,0) completedrequests, IFNULL(cs.cancelledrequests,0) cancelledrequests, IFNULL(cs.allproperties,0) allproperties " +
+            "FROM customer c " +
+            "JOIN aceconfig ac ON ac.ordinal = c.customertypeid AND ac.groupid = ? " +
+            "LEFT JOIN customerstat cs ON c.username = cs.username AND cs.year = year(?) AND cs.month = month(?)", [CUSTTYPE_GID, querydate, querydate], callback);
     }
 }
 
