@@ -241,7 +241,7 @@ var ClaimDTO = {
         var querydate = now.format("Y-m-d H:M:S");
 
         logger.info("query: getRequestCountStat("+querydate+")");
-        db.query("SELECT allrequests, closedrequests, rejectedrequests, cancelledrequests, closed1d, closed1w, closedgt1w " +
+        db.query("SELECT allrequests, openrequests, closedrequests, rejectedrequests, cancelledrequests, closed1d, closed1w, closedgt1w " +
             "FROM requestcountstat " +
             "WHERE year = year(?)", [querydate], callback);
     },
