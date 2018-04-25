@@ -588,10 +588,12 @@ USE `acebody`;
 CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `acebody`.`workitemdetails` AS select `wh`.`workitemid` AS `workitemid`,`wh`.`worklogid` AS `worklogid`,`wh`.`worktype` AS `worktype`,`ac11`.`longdesc` AS `worktypename`,`wh`.`creationdate` AS `creationdate`,`wh`.`description` AS `description`,`wh`.`notes` AS `notes`,`wh`.`auditwho` AS `auditwho`,`wh`.`auditwhen` AS `auditwhen`,`a`.`itemid` AS `itemid`,`a`.`attachment` AS `attachment`,`a`.`type` AS `attachmenttype`,`ac10`.`shortdesc` AS `filetypename`,`a`.`auditwho` AS `attachwho`,`a`.`auditwhen` AS `attachwhen`,`i`.`inspectionid` AS `inspectionid`,`i`.`description` AS `inspectiondesc`,`i`.`response` AS `inspectionresp`,`i`.`submitteddate` AS `inspectioncreatedate`,`i`.`responsedate` AS `inspectionrespdate`,`i`.`inspectiondate` AS `inspectiondate`,`i`.`auditwho` AS `inspectionwho`,`i`.`auditwhen` AS `inspectionwhen` from (((((`acebody`.`workloghistory` `wh` join `acebody`.`aceconfig` `ac11` on(((`ac11`.`ordinal` = `wh`.`worktype`) and (`ac11`.`groupid` = 11)))) left join `acebody`.`worklogattachrel` `wl` on((`wl`.`workitemid` = `wh`.`workitemid`))) left join `acebody`.`attachment` `a` on((`wl`.`itemid` = `a`.`itemid`))) left join `acebody`.`aceconfig` `ac10` on(((`ac10`.`ordinal` = `a`.`type`) and (`ac11`.`groupid` = 10)))) left join `acebody`.`inspection` `i` on((`wh`.`workitemid` = `i`.`workitemid`)));
 
 -- -----------------------------------------------------
--- Insert admin user
+-- Insert admin user (Super User)
 -- -----------------------------------------------------
 INSERT INTO user (username, firstname, lastname, password, roleid, emailaddress, status)
 VALUES('aceadmin', 'Ace', 'Admin', SHA('memoday'), 1, 'ktbartolo@up.edu.ph', 2);
+INSERT INTO staff(username, staffname, department, accesstype)
+VALUES('aceadmin', 'Ace Admin', 1, 1);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
