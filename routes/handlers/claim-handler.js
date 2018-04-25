@@ -110,14 +110,17 @@ var ClaimHandler = {
         }
     },
     getAllClaims: function(req, res, next) {
-        var numPerPage = parseInt(req.query.npp, 10) || 5;
+        /*var numPerPage = parseInt(req.query.npp, 10) || 5;
         var page = parseInt(req.query.page, 10) || 0;
-        var skip = (page-1) * numPerPage;
+        var skip = (page-1) * numPerPage;*/
 
-        if(skip < 0) { skip = 0 }
+        //if(skip < 0) { skip = 0 }
 
-        claim.getAllClaims(skip, numPerPage, function(error, results) {
-            logger.info("c [" + skip + "," + numPerPage + "]");
+        var startdate = Date.parse(req.params.startdate) || Date.now();
+        var enddate = Date.parse(req.params.enddate) || Date.now();
+
+        claim.getAllClaims(startdate, enddate, function(error, results) {
+            logger.info("getAllClaims()", req.id);
             console.log(results);
             if (error) {
                 // Handle basic error
@@ -134,14 +137,12 @@ var ClaimHandler = {
             if(results.length > 0) {
                 res.json({
                     success: true,
-                    page: page,
                     claims: rows
                 });
 
             } else {
                 res.json({
                     success: false,
-                    page: page,
                     claims: null
                 })
             }

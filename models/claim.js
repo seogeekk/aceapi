@@ -47,41 +47,82 @@ var ClaimDTO = {
                             claimObj.claimid
                         ], callback);
     },
-    getAllClaims: function(limit, offset, callback) {
+    getAllClaims: function(startdate, enddate, callback) {
 
-        logger.info("query: getAllClaims["+limit+","+offset+"]");
-        db.query("SELECT c.claimid," +
-                        "c.property_canonical_id," +
-                        "c.propertyid," +
-                        "c.address1," +
-                        "c.address2," +
-                        "c.suburb," +
-                        "c.state," +
-                        "c.postcode," +
-                        "c.country," +
-                        "c.propertytypeid," +
-                        "c.propertytypename," +
-                        "c.latitude," +
-                        "c.longitude," +
-                        "c.mesh_block," +
-                        "c.unit_type," +
-                        "c.claimtypeid," +
-                        "c.claimtypename," +
-                        "c.summary," +
-                        "c.description," +
-                        "c.submitteddate," +
-                        "c.submitteduser," +
-                        "c.submittedname," +
-                        "ca.assignusername," +
-                        "ca.assignname," +
-                        "c.status," +
-                        "c.statusname," +
-                        "c.approvaldate," +
-                        "c.approveruser," +
-                        "c.auditwho " +
-                    "FROM claimdetails c " +
-                    "JOIN claimassigndetails ca ON ca.claimid = c.claimid " +
-                        "LIMIT ?, ?", [limit, offset], callback);
+        var now = datetime.create(startdate);
+        startdate = now.format("Y-m-d H:M:S");
+        now = datetime.create(enddate);
+        enddate = now.format("Y-m-d H:M:S");
+
+        logger.info("query: getAllClaims[]");
+        if (startdate == enddate) {
+            db.query("SELECT c.claimid," +
+                "c.property_canonical_id," +
+                "c.propertyid," +
+                "c.address1," +
+                "c.address2," +
+                "c.suburb," +
+                "c.state," +
+                "c.postcode," +
+                "c.country," +
+                "c.propertytypeid," +
+                "c.propertytypename," +
+                "c.latitude," +
+                "c.longitude," +
+                "c.mesh_block," +
+                "c.unit_type," +
+                "c.claimtypeid," +
+                "c.claimtypename," +
+                "c.summary," +
+                "c.description," +
+                "c.submitteddate," +
+                "c.submitteduser," +
+                "c.submittedname," +
+                "ca.assignusername," +
+                "ca.assignname," +
+                "c.status," +
+                "c.statusname," +
+                "c.approvaldate," +
+                "c.approveruser," +
+                "c.auditwho " +
+                "FROM claimdetails c " +
+                "LEFT JOIN claimassigndetails ca ON ca.claimid = c.claimid "
+                , callback);
+        } else {
+            db.query("SELECT c.claimid," +
+                "c.property_canonical_id," +
+                "c.propertyid," +
+                "c.address1," +
+                "c.address2," +
+                "c.suburb," +
+                "c.state," +
+                "c.postcode," +
+                "c.country," +
+                "c.propertytypeid," +
+                "c.propertytypename," +
+                "c.latitude," +
+                "c.longitude," +
+                "c.mesh_block," +
+                "c.unit_type," +
+                "c.claimtypeid," +
+                "c.claimtypename," +
+                "c.summary," +
+                "c.description," +
+                "c.submitteddate," +
+                "c.submitteduser," +
+                "c.submittedname," +
+                "ca.assignusername," +
+                "ca.assignname," +
+                "c.status," +
+                "c.statusname," +
+                "c.approvaldate," +
+                "c.approveruser," +
+                "c.auditwho " +
+                "FROM claimdetails c " +
+                "LEFT JOIN claimassigndetails ca ON ca.claimid = c.claimid " +
+                "WHERE c.submitteddate BETWEEN ? AND ?",
+                [startdate, enddate]    , callback);
+        }
     },
     getClaimDetails: function(claimid, callback) {
         logger.info("query: getClaimDetails["+claimid+"]");

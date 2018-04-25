@@ -56,13 +56,12 @@ var PropertyDTO = {
                         propertyObj.property_canonical_id
                     ], callback);
     },
-    getAllProperties: function(limit, offset, callback) {
+    getAllProperties: function(callback) {
 
-        logger.info("query: getAllProperties["+limit+","+offset+"]");
+        logger.info("query: getAllProperties[]");
         db.query("SELECT distinct p.propertyid, p.property_canonical_id, c.submitteduser, p.address1, p.address2, p.suburb, p.state, p.postcode, p.country, p.propertytype as propertytypeid, ac.longdesc as propertytypename, p.latitude, p.longitude, p.mesh_block, p.unit_type " +
             "FROM property p LEFT JOIN aceconfig ac ON ac.ordinal = p.propertytype AND ac.groupid = ? " +
-            "LEFT JOIN claim c ON c.property_canonical_id = p.property_canonical_id " +
-            "LIMIT ?, ?", [PROPERTYTYPE_GID, limit, offset], callback);
+            "LEFT JOIN claim c ON c.property_canonical_id = p.property_canonical_id ", [PROPERTYTYPE_GID], callback);
     },
     getPropertyDetails: function(propertyid, callback) {
 

@@ -557,7 +557,9 @@ router.post(apiversion + 'claim/update', claim.updateClaimDetails);
  *               $ref: "#/definitions/claim"
  *
  */
-router.get(apiversion + 'claim/', claim.getAllClaims);
+router.get(apiversion + 'claim/all/', claim.getAllClaims);
+router.get(apiversion + 'claim/all/:startdate', claim.getAllClaims);
+router.get(apiversion + 'claim/all/:startdate/:enddate', claim.getAllClaims);
 /**
  * @swagger
  *

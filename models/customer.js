@@ -33,11 +33,10 @@ var customerDTO = {
             callback(error, results[0]);
         });
     },
-    getAllCustomers: function(limit, npp, callback) {
-        logger.info("query: getAllCustomers["+limit+","+npp+"]");
+    getAllCustomers: function(callback) {
+        logger.info("query: getAllCustomers[]");
         db.query("SELECT customerid, customertypeid as custtypeid, longdesc as custtype, username, customername, address1, address2, suburb, state, postcode, country FROM customer " +
-            " LEFT JOIN aceconfig ON aceconfig.ordinal = customer.customertypeid AND groupid = ? " +
-            " LIMIT ?, ?", [CUSTTYPE_GID, limit, npp], callback);
+            " LEFT JOIN aceconfig ON aceconfig.ordinal = customer.customertypeid AND groupid = ? ", [CUSTTYPE_GID], callback);
     },
     updateCustomer: function(custObj, callback) {
         logger.info("query: updateCustomer[" + custObj.customerid + "]");

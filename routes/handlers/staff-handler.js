@@ -100,14 +100,14 @@ var StaffHandler = {
         }
     },
     getAllStaff: function(req, res, next) {
-        var numPerPage = parseInt(req.query.npp, 10) || 5;
+        /*var numPerPage = parseInt(req.query.npp, 10) || 5;
         var page = parseInt(req.query.page, 10) || 0;
         var skip = (page-1) * numPerPage;
 
-        if(skip < 0) { skip = 0 }
+        if(skip < 0) { skip = 0 }*/
 
-        staff.getAllStaff(skip, numPerPage, function(error, results) {
-            logger.info("c [" + skip + "," + numPerPage + "]");
+        staff.getAllStaff(function(error, results) {
+            logger.info("getAllStaff()", req.id);
             console.log(results);
             if (error) {
                 // Handle basic error
@@ -124,14 +124,12 @@ var StaffHandler = {
             if(results.length > 0) {
                 res.json({
                     success: true,
-                    page: page,
                     staff: rows
                 });
 
             } else {
                 res.json({
                     success: false,
-                    page: page,
                     staff: null
                 })
             }

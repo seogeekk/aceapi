@@ -114,14 +114,14 @@ var PropertyHandler = {
         }
     },
     getAllProperties: function(req, res, next) {
-        var numPerPage = parseInt(req.query.npp, 10) || 5;
+        /*var numPerPage = parseInt(req.query.npp, 10) || 5;
         var page = parseInt(req.query.page, 10) || 0;
         var skip = (page-1) * numPerPage;
 
-        if(skip < 0) { skip = 0 }
+        if(skip < 0) { skip = 0 }*/
 
-        property.getAllProperties(skip, numPerPage, function(error, results) {
-            logger.info("c [" + skip + "," + numPerPage + "]");
+        property.getAllProperties(function(error, results) {
+            logger.info("getAllProperties()", req.id);
             console.log(results);
             if (error) {
                 // Handle basic error
@@ -138,14 +138,12 @@ var PropertyHandler = {
             if(results.length > 0) {
                 res.json({
                     success: true,
-                    page: page,
                     properties: rows
                 });
 
             } else {
                 res.json({
                     success: false,
-                    page: page,
                     properties: null
                 })
             }
