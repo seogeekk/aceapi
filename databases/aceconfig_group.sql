@@ -43,8 +43,6 @@ INSERT INTO aceconfig (groupid, ordinal, shortdesc, auditwho)
 				VALUES(2, 2, 'Active', @l_user);
 INSERT INTO aceconfig (groupid, ordinal, shortdesc, auditwho) 
 				VALUES(2, 3, 'Locked', @l_user);
-INSERT INTO aceconfig (groupid, ordinal, shortdesc, auditwho) 
-				VALUES(2, 4, 'Deleted', @l_user);
 
 select * from aceconfig where groupid = 2;
 
