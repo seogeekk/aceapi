@@ -27,6 +27,7 @@ var UserDTO = {
         console.log(User);
         db.getConnection(function(err, connection) {
             connection.beginTransaction(function(err) {
+
                 connection.query("INSERT INTO user (username, firstname, lastname, emailaddress, password, roleid, status)" +
                     "VALUES (?, ?, ?, ?, SHA(?), ?, 1)", [User.username, User.firstname, User.lastname, User.emailaddress, User.password, User.roleid], function(err, result) {
                     if(err) {
@@ -46,28 +47,104 @@ var UserDTO = {
                         var profilename = User.firstname + ' ' + User.lastname;
                         var department = User.department;
                         var accesstype = User.accesstype;
+                        var customertype = User.customertype;
+                        var address = User.address;
                         var roleid = User.roleid;
+                        var mobile = User.mobilenumber;
 
                         if (roleid == 4) {
-                            // create customer
-                            connection.query("INSERT INTO customer (username, customername) VALUES(?, ?)", [username, profilename], function(err, result) {
-                                if(err) {
-                                    return connection.rollback(function() {
-                                        callback(err);
-                                    });
-                                }
+                            // create customer if with address
+                            if (address) {
+                                connection.query("INSERT INTO customer (username, customername, customertypeid, address1, address2, suburb, state, postcode, country) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                    [username, profilename, customertype, address.address1, address.address2, address.suburb, address.state, address.postcode, address.country], function(err, result) {
+                                        if(err) {
+                                            return connection.rollback(function() {
+                                                callback(err);
+                                            });
+                                        }
 
-                                // COMMIT if customer created
-                                return connection.commit(function(err) {
-                                    if(err) {
-                                        return connection.rollback(function(){
-                                            callback(err);
-                                        })
-                                    }
-                                    connection.release();
-                                    callback(null, result);
-                                })
-                            });
+                                        // if mobile is provided
+                                        if (mobile) {
+                                            connection.query("UPDATE user SET mobilenumber = ? WHERE username = ?",
+                                                [mobile, username], function(err, result) {
+                                                    if (err) {
+                                                        return connection.rollback(function () {
+                                                            callback(err);
+                                                        });
+                                                    }
+
+
+                                                    // COMMIT if customer created
+                                                    return connection.commit(function (err) {
+                                                        if (err) {
+                                                            return connection.rollback(function () {
+                                                                callback(err);
+                                                            })
+                                                        }
+                                                        connection.release();
+                                                        callback(null, result);
+                                                    })
+                                                });
+                                        } else {
+                                            // COMMIT if customer created
+                                            return connection.commit(function (err) {
+                                                if (err) {
+                                                    return connection.rollback(function () {
+                                                        callback(err);
+                                                    })
+                                                }
+                                                connection.release();
+                                                callback(null, result);
+                                            })
+                                        }
+
+                                    });
+                            } else {
+                                connection.query("INSERT INTO customer (username, customername, customertypeid) VALUES(?, ?, ?)",
+                                    [username, profilename, customertype], function(err, result) {
+                                        if(err) {
+                                            return connection.rollback(function() {
+                                                callback(err);
+                                            });
+                                        }
+
+                                        // if mobile is provided
+                                        if (mobile) {
+                                            connection.query("UPDATE user SET mobilenumber = ? WHERE username = ?",
+                                                [mobile, username], function(err, result) {
+                                                    if (err) {
+                                                        return connection.rollback(function () {
+                                                            callback(err);
+                                                        });
+                                                    }
+
+
+                                                    // COMMIT if customer created
+                                                    return connection.commit(function (err) {
+                                                        if (err) {
+                                                            return connection.rollback(function () {
+                                                                callback(err);
+                                                            })
+                                                        }
+                                                        connection.release();
+                                                        callback(null, result);
+                                                    })
+                                                });
+                                        } else {
+                                            // COMMIT if customer created
+                                            return connection.commit(function (err) {
+                                                if (err) {
+                                                    return connection.rollback(function () {
+                                                        callback(err);
+                                                    })
+                                                }
+                                                connection.release();
+                                                callback(null, result);
+                                            })
+                                        }
+                                    });
+                            }
+
                         } else {
                             // this is staff
                             connection.query("INSERT INTO staff (username, staffname, department, accesstype) VALUES(?, ?, ?, ?)", [username, profilename, department, accesstype], function(err, result) {

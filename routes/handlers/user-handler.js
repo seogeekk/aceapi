@@ -110,6 +110,9 @@ var UserHandler = {
         var lastname = req.body.lastname;
         var emailaddress = req.body.emailaddress;
         var password = req.body.password;
+        var address = req.body.address;
+        var mobile = req.body.mobilenumber;
+        var customertype = req.body.customertypeid;
         var roleid = parseInt(req.body.roleid) || 4; // default to client if not provided
 
         // Staff related
@@ -129,7 +132,10 @@ var UserHandler = {
             password: password,
             roleid: roleid,
             department: department,
-            accesstype: accesstype
+            accesstype: accesstype,
+            address: address,
+            mobilenumber: mobile,
+            customertype: customertype
         }
 
         console.log(User);
