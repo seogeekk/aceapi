@@ -88,6 +88,29 @@ var NotificationHandler = {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
     },
+    getAdminDashboard: function(req, res, next) {
+        notification.getAdminDashboard(function(error, results) {
+            logger.info("getAdminDashboard[]");
+            if (error) {
+                // Handle basic error
+                res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                return;
+            }
+
+            if(results.length == 1) {
+                res.json({
+                    success: true,
+                    dashboard: results[0]
+                });
+
+            } else {
+                res.json({
+                    success: false,
+                    dashboard: null
+                })
+            }
+        });
+    },
     getStaffCalendar: function(req, res, next) {
         var username = req.params.username;
 

@@ -296,6 +296,21 @@ var ClaimDTO = {
             "JOIN aceconfig ac ON ac.ordinal = c.status " +
             "AND ac.groupid = 4 " +
             "WHERE c.year = year(?) AND c.month = month(?)", [querydate, querydate], callback);
+    },
+    getClaimByProperty: function(property_canonical_id, callback) {
+
+        logger.info("query: getClaimByProperty("+property_canonical_id+")");
+        db.query("SELECT claimid, summary, claimtypename, submitteddate " +
+            "FROM claimdetails " +
+            "WHERE property_canonical_id = ?", [property_canonical_id], callback);
+    },
+    getClaimByStaff: function(username, callback) {
+
+        logger.info("query: getClaimByUser("+username+")");
+        db.query("SELECT c.claimid, c.summary, c.claimtypename, c.submitteddate " +
+            "FROM claimdetails c " +
+            "JOIN claimassigndetails ca ON ca.claimid = c.claimid " +
+            "WHERE ca.assignusername = ?", [username], callback);
     }
 };
 

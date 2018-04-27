@@ -149,6 +149,49 @@ var PropertyHandler = {
             }
         });
     },
+    getAllPropertiesByUser: function(req, res, next) {
+        /*var numPerPage = parseInt(req.query.npp, 10) || 5;
+        var page = parseInt(req.query.page, 10) || 0;
+        var skip = (page-1) * numPerPage;
+
+        if(skip < 0) { skip = 0 }*/
+
+        var username = req.params.username;
+
+        if (username) {
+            property.getAllPropertiesByUser(username, function(error, results) {
+                logger.info("getAllPropertiesByUser("+username+")", req.id);
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                logger.info("getAllProperties() ret: " + results.length);
+                var rows = [];
+                for (var i = 0; i < results.length; i++) {
+                    rows.push(new propertyDetObj(results[i]));
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        properties: rows
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        properties: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+
+    },
     getPropertyDetails: function(req, res, next) {
         var propertyid = req.params.propertyid;
 

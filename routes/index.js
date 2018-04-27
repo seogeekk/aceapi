@@ -403,6 +403,7 @@ router.post(apiversion + 'property/update', property.updatePropertyDetails);
  *
  */
 router.get(apiversion + 'property/', property.getAllProperties);
+router.get(apiversion + 'property/user/:username', property.getAllPropertiesByUser);
 /**
  * @swagger
  *
@@ -496,7 +497,10 @@ router.post(apiversion + 'claim/new', claim.createNewClaim);
  *               $ref: "#/definitions/claim"
  *
  */
-router.get(apiversion + 'claim/username/:username', claim.getClaimByUser);
+router.get(apiversion + 'claim/user/:username', claim.getClaimByUser);
+
+router.get(apiversion + 'claim/property/:property', claim.getClaimByProperty);
+router.get(apiversion + 'claim/staff/:username', claim.getClaimByStaff);
 /**
  * @swagger
  * /api/v1/claim/update:
@@ -890,6 +894,7 @@ router.post(apiversion + 'notification/verifymail', notification.sendVerifyEmail
 router.get(apiversion + 'dashboard/user/:username', notification.getUserDashboard);
 router.get(apiversion + 'dashboard/staff/:username', notification.getStaffDashboard);
 router.get(apiversion + 'dashboard/calendar/:username', notification.getStaffCalendar);
+router.get(apiversion + 'dashboard/admin', notification.getAdminDashboard);
 
 // stats
 router.get(apiversion + 'stats/suburb/:reportdate', claim.getSuburbStat);
@@ -905,6 +910,7 @@ router.post(apiversion + 'claim/assign/', claim.assignClaim);
 router.get(apiversion + 'claim/assign/:claimid', claim.getAssignment);
 router.get(apiversion + 'claim/assign/all/:username', claim.getAssignedByUser);
 router.post(apiversion + 'claim/approve/', claim.approveClaim);
+
 
 // attachment
 router.get(apiversion + 'attachment/download/:itemid', worklog.downloadAttachment);

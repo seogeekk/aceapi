@@ -25,6 +25,13 @@ var InspectionDTO = {
             "WHERE c.submitteduser = ?" +
             "GROUP BY c.submitteduser", [username], callback);
     },
+    getAdminDashboard: function(callback) {
+        db.query("SELECT " +
+            "(select count(1) from claim) as allrequests, " +
+            "(select count(1) from claim where status < 7) as openrequests, " +
+            "(select count(1) from claim where status = 4) as allapprovals, " +
+            "(select count(1) from property) as allproperties", callback);
+    },
     getStaffDashboard: function(username, callback) {
         db.query("SELECT ca.assignusername, " +
                         "(select count(1) from claim) as allrequests, " +
@@ -42,7 +49,7 @@ var InspectionDTO = {
                 "GROUP BY ca.assignusername", username, callback);
     },
     getStaffCalendar: function(username, callback) {
-        db.query("SELECT i.claimid, i.description, i.inspectiondate " +
+        db.query("SELECT i.inspectionid, i.claimid, i.description, i.inspectiondate " +
                 "FROM inspectiondetails i " +
                 "JOIN claimassigndetails ca ON ca.claimid = i.claimid " +
                 "WHERE i.inspectiondate >= CURRENT_DATE " +

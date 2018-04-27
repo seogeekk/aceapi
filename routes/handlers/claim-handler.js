@@ -247,6 +247,66 @@ var ClaimHandler = {
             res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
         }
     },
+    getClaimByProperty: function(req, res, next) {
+        var property_canonical_id = req.params.property;
+
+        if(property_canonical_id) {
+            claim.getClaimByProperty(property_canonical_id, function(error, results) {
+                logger.info("getClaimByProperty[" + property_canonical_id + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        claims: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        claims: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
+    getClaimByStaff: function(req, res, next) {
+        var username = req.params.username;
+
+        if(username) {
+            claim.getClaimByStaff(username, function(error, results) {
+                logger.info("getClaimByStaff[" + username + "]");
+                console.log(results);
+                if (error) {
+                    // Handle basic error
+                    res.status(constants.SERVER_ERROR_CODE).json(parseError(error));
+                    return;
+                }
+
+                if(results.length > 0) {
+                    res.json({
+                        success: true,
+                        claims: results
+                    });
+
+                } else {
+                    res.json({
+                        success: false,
+                        claims: null
+                    })
+                }
+            });
+        } else {
+            res.status(constants.SERVER_ERROR_CODE).json(new errhandler('ERR003'));
+        }
+    },
     getAssignedByUser: function(req, res, next) {
         var username = req.params.username;
 
