@@ -202,6 +202,7 @@ var InspectionHandler = {
                     return;
                 }
 
+                console.log(results[0]);
                 if (results.length == 1) {
                     res.json({
                         success: true,
